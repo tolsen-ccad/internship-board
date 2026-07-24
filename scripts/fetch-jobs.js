@@ -1,10 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
-// Keywords that must NOT be present in the title
+// Keywords that must NOT be present in the title (blocks senior/management roles)
 const EXCLUDED_KEYWORDS = [
   "senior", "sr", "lead", "director", "manager", 
-  "principal", "staff", "head of", "chief", "expert", "experienced", "junior", "entry"
+  "principal", "staff", "head of", "chief", "expert", "experienced"
 ];
 
 function isSeniorOrManagement(title) {
@@ -19,8 +19,8 @@ async function fetchGoogleJobs() {
     return [];
   }
 
-  // Expanded query targeting 3D modeling/design internships across multiple sectors
-  const query = "3d artist intern OR 3d modeler internship OR medical 3d intern OR automotive design intern OR product design intern OR hard surface modeling intern";
+  // Broadened query targeting entry-level, junior, and internship 3D roles across sectors
+  const query = "3d artist intern OR 3d modeler entry level OR junior 3d designer OR medical 3d intern OR product design junior";
   const url = `https://serpapi.com/search.json?engine=google_jobs&q=${encodeURIComponent(query)}&api_key=${apiKey}`;
 
   try {
@@ -29,7 +29,7 @@ async function fetchGoogleJobs() {
     
     if (!data.jobs_results) return [];
 
-    // Filter out any roles containing senior/management or non-intern terms
+    // Filter out any roles containing senior/management terms
     const filteredJobs = data.jobs_results.filter(job => !isSeniorOrManagement(job.title));
 
     return filteredJobs.map(job => ({
@@ -38,7 +38,7 @@ async function fetchGoogleJobs() {
       location: job.location || "Remote",
       url: job.related_links?.[0]?.link || job.apply_options?.[0]?.link || "https://www.google.com/search?q=" + encodeURIComponent(job.title),
       posted: new Date().toISOString().split('T')[0],
-      tags: ["Internship", "3D Game Art"]
+      tags: ["Entry-Level / Internship", "3D Modeling"]
     }));
   } catch (error) {
     console.error("Error fetching jobs:", error);
@@ -53,7 +53,7 @@ async function updateBoard() {
     return;
   }
 
-  console.log(`Successfully fetched and filtered ${newJobs.length} alternative 3D modeling internship listings.`);
+  console.log(`Successfully fetched and filtered ${newJobs.length} entry-level/internship 3D modeling listings.`);
 }
 
 updateBoard();
