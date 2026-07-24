@@ -22,6 +22,10 @@
     --purple: #9f7aea;
   }
 
+  html{
+    scroll-behavior: smooth;
+  }
+
   *{ box-sizing: border-box; }
 
   body{
@@ -202,6 +206,67 @@
   .card.stale:hover{ opacity: 0.85; border-color: var(--rose); }
   .empty, .loading{ text-align:center; padding: 50px 20px; color: var(--text-muted); font-size: 14px; }
 
+  .manual-check{
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px dashed var(--border);
+    scroll-margin-top: 20px;
+  }
+  .manual-check h2{
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    color: var(--teal);
+    margin: 0 0 6px;
+  }
+  .manual-check .manual-check-sub{
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0 0 16px;
+    line-height: 1.5;
+  }
+  .manual-check-grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  .manual-check-item{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+  .manual-check-item h3{
+    font-size: 14px;
+    margin: 0 0 4px;
+    color: var(--text);
+  }
+  .manual-check-item p{
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0 0 10px;
+    line-height: 1.4;
+  }
+  .manual-check-links{
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .manual-check-links a{
+    font-size: 12px;
+    color: var(--amber);
+    text-decoration: none;
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 999px;
+    transition: border-color 0.15s ease;
+  }
+  .manual-check-links a:hover{ border-color: var(--amber); }
+  .manual-check-note{
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
   footer{
     margin-top: 30px;
     font-size: 11px;
@@ -222,6 +287,7 @@
     <nav class="board-nav">
       <a href="index.html" class="nav-item active">⚔ Internships &amp; Entry-level</a>
       <a href="gigs.html" class="nav-item">💎 Contract &amp; Gigs</a>
+      <a href="#manual-check" class="nav-item">🔍 Also Check These Sites ↓</a>
     </nav>
   </header>
 
@@ -234,6 +300,41 @@
   </div>
 
   <div class="feed" id="feed"></div>
+
+  <div class="manual-check" id="manual-check">
+    <h2>// ALSO WORTH CHECKING</h2>
+    <p class="manual-check-sub">These platforms don't allow automated searching (their terms of service block it), so they can't feed into the board above — but they're genuinely useful, and worth checking by hand.</p>
+    <div class="manual-check-grid">
+      <div class="manual-check-item">
+        <h3>Upwork</h3>
+        <p>The largest freelance marketplace — apply directly to posted jobs.</p>
+        <div class="manual-check-links">
+          <a href="https://www.upwork.com/nx/search/jobs/?q=3d+game+artist" target="_blank" rel="noopener noreferrer">3D Game Artist</a>
+          <a href="https://www.upwork.com/nx/search/jobs/?q=2d+concept+artist" target="_blank" rel="noopener noreferrer">2D Concept Artist</a>
+          <a href="https://www.upwork.com/nx/search/jobs/?q=game+designer" target="_blank" rel="noopener noreferrer">Game Designer</a>
+        </div>
+      </div>
+      <div class="manual-check-item">
+        <h3>ArtStation Jobs</h3>
+        <p>Industry job board for games, film & media artists — filter by Freelance.</p>
+        <div class="manual-check-links">
+          <a href="https://www.artstation.com/jobs" target="_blank" rel="noopener noreferrer">Browse Jobs</a>
+        </div>
+      </div>
+      <div class="manual-check-item">
+        <h3>Polycount</h3>
+        <p>Long-running 3D/2D game art community — active freelance postings forum.</p>
+        <div class="manual-check-links">
+          <a href="https://polycount.com/categories/freelance-job-postings" target="_blank" rel="noopener noreferrer">Freelance Postings</a>
+        </div>
+      </div>
+      <div class="manual-check-item">
+        <h3>Fiverr</h3>
+        <p>Works differently — there's no public job list to link to. Create a seller profile, then check "Buyer Requests" under the More menu for briefs you can respond to.</p>
+        <p class="manual-check-note">No direct link available — this one requires an account.</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 <footer>Sources refresh live from studio APIs & curated boards. <br> Made with love from Tay <3</footer>
