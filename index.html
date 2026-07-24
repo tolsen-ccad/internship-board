@@ -137,6 +137,7 @@
     color: #241a05;
   }
   .rank.co-op{ background: linear-gradient(160deg, var(--teal), #1f8a80); color:#052622; }
+  .rank.junior{ background: linear-gradient(160deg, var(--rose), #b23b5e); color:#2b0512; }
 
   .card-body{ flex:1; min-width:0; }
   .card-title{ font-size: 15px; font-weight:600; margin: 0 0 3px; }
@@ -180,7 +181,7 @@
   <header>
     <p class="eyebrow">// GAME ART &amp; DESIGN</p>
     <h1 id="page-title">INTERNSHIP<br>QUEST BOARD</h1>
-    <p class="sub">Live AAA & indie internship listings, pulled fresh each visit.</p>
+    <p class="sub">Live AAA, indie, & entry-level listings, pulled fresh each visit.</p>
   </header>
 
   <div class="controls" id="tag-filters"></div>
@@ -200,40 +201,40 @@
 const CONFIG = {
   pageTitle: "INTERNSHIP<br>QUEST BOARD",
 
-  // Strict keywords ensuring only true training/internship roles pass through
-  keywords: ["intern", "internship", "co-op", "co op", "apprentice", "trainee"],
-  excludedKeywords: ["senior", "sr", "lead", "director", "manager", "principal", "staff", "head of", "chief", "expert", "experienced"],
+  keywords: ["intern", "internship", "co-op", "co op", "apprentice", "entry", "junior", "artist", "3d"],
   staleAfterDays: 60,
 
+  // Expanded Greenhouse API tokens (AAA & prominent studios)
   greenhouseBoards: [
-    "insomniac",          
-    "wildlifestudios",   
-    "gramgamescareers",   
-    "neteasegames",       
-    "surviosinterns",     
-    "cloudchamberen",    
-    "2k",                
-    "rockstargames",      
-    "riotgames",          
-    "epicgames",          
-    "bungie",             
-    "mediamolecule",      
-    "respawn",            
-    "sledgehammergames",  
-    "ea",                 
-    "devolverdigital",    
-    "naughtydog",         
+    "insomniac",          // Insomniac Games
+    "wildlifestudios",    // Wildlife Studios
+    "gramgamescareers",   // Gram Games
+    "neteasegames",       // NetEase Games
+    "surviosinterns",     // Survios
+    "cloudchamberen",     // Cloud Chamber (2K)
+    "2k",                 // 2K Games
+    "rockstargames",      // Rockstar Games
+    "riotgames",          // Riot Games
+    "epicgames",          // Epic Games
+    "bungie",             // Bungie (Destiny)
+    "mediamolecule",      // Media Molecule (PlayStation)
+    "respawn",            // Respawn Entertainment (EA)
+    "sledgehammergames",  // Sledgehammer Games (Activision)
+    "ea",                 // Electronic Arts general board tokens where active
+    "devolverdigital",    // Devolver Digital (Indie publisher)
+    "naughtydog",         // Naughty Dog (PlayStation)
   ],
 
+  // Expanded Lever API tokens (Indie & AAA-adjacent studios)
   leverBoards: [
-    "larian",               
-    "dreamgames",           
-    "voodoo",               
-    "blackbirdinteractive", 
-    "behaviourinteractive", 
-    "midasplayer",          
-    "fireshinegames",       
-    "cead",                 
+    "larian",               // Larian Studios
+    "dreamgames",           // Dream Games
+    "voodoo",               // Voodoo
+    "blackbirdinteractive", // Blackbird Interactive
+    "behaviourinteractive", // Behaviour Interactive (Dead by Daylight)
+    "midasplayer",          // King / assorted mobile teams
+    "fireshinegames",       // Fireshine Games
+    "cead",                 // Independent teams using Lever
   ],
 
   rssFeeds: [
@@ -251,33 +252,31 @@ const CONFIG = {
     },
   ],
 
-  // Specific keyword sets for isolated tag assignment
-  tagMatchRules: {
-    "Internship": [
-      "intern", "internship", "co-op", "co op", "apprentice", "trainee"
-    ],
+  curriculumTracks: {
     "3D Game Art": [
       "3d artist", "3d modeler", "modeling", "modeler", "texturing",
       "texture artist", "rigging", "technical artist", "environment artist",
       "character artist", "vfx", "animator", "animation",
-      "maya", "blender", "substance painter", "substance", "zbrush", "3d"
+      "maya", "blender", "substance painter", "substance", "zbrush",
+      "unreal", "unity", "game engine", "3d",
     ],
     "2D Game Art": [
       "2d artist", "illustrator", "concept artist", "ui artist", "ui/ux",
       "ux designer", "graphic design", "character design",
-      "environment design", "map design", "pixel art",
-      "2d character", "skybox", "photoshop", "2d"
+      "environment design", "map design", "print production", "pixel art",
+      "2d character", "skybox", "game rules", "layout design", "photoshop",
     ],
     "Digital Playspaces": [
       "experimental media", "live media", "alternate controller",
       "accessibility", "board game design", "tabletop design",
-      "installation", "interactive media", "physical computing"
-    ]
+      "installation", "interactive media", "physical computing",
+      "unreal", "unity",
+    ],
   },
 
   manualListings: [
-    { title: "UI Art Intern", company: "Double Twizzle Games", location: "Remote", url: "https://www.workwithindies.com/careers/double-twizzle-games-ui-artist", posted: "2026-07-23", tags: ["2D Game Art", "Internship"] },
-    { title: "Cinematic Art Apprentice", company: "Firefly Studios", location: "Remote", url: "https://www.workwithindies.com/careers/firefly-studios-cinematic-designer-artist", posted: "2026-07-23", tags: ["3D Game Art", "Internship"] },
+    { title: "UI Artist", company: "Double Twizzle Games", location: "Remote", url: "https://www.workwithindies.com/careers/double-twizzle-games-ui-artist", posted: "2026-07-23", tags: ["2D Game Art"] },
+    { title: "Cinematic Designer / Artist", company: "Firefly Studios", location: "Remote", url: "https://www.workwithindies.com/careers/firefly-studios-cinematic-designer-artist", posted: "2026-07-23", tags: ["3D Game Art"] },
   ],
 };
 
@@ -292,34 +291,29 @@ document.getElementById('page-title').innerHTML = CONFIG.pageTitle;
 let allListings = [];
 let activeTag = null;
 
-function isValidJob(title){
+function matchesKeyword(title){
   const t = title.toLowerCase();
-  const hasExcluded = CONFIG.excludedKeywords.some(ex => t.includes(ex));
-  if (hasExcluded) return false;
   return CONFIG.keywords.some(k => t.includes(k));
 }
 
-function computeTags(title){
-  const t = title.toLowerCase();
-  const assignedTags = [];
-  
-  for (const [tagName, keywords] of Object.entries(CONFIG.tagMatchRules)) {
-    if (keywords.some(k => t.includes(k))) {
-      assignedTags.push(tagName);
-    }
-  }
-  return assignedTags;
+function classifyTracks(text){
+  const t = text.toLowerCase();
+  return Object.entries(CONFIG.curriculumTracks)
+    .filter(([, keywords]) => keywords.some(k => t.includes(k)))
+    .map(([trackName]) => trackName);
 }
 
 function rankClass(tags){
   const t = tags.join(' ').toLowerCase();
   if (t.includes('co-op') || t.includes('co op')) return 'co-op';
+  if (t.includes('junior') || t.includes('entry')) return 'junior';
   return '';
 }
 
 function rankLabel(tags){
   const cls = rankClass(tags);
   if (cls === 'co-op') return 'CO';
+  if (cls === 'junior') return 'JR';
   return 'IN';
 }
 
@@ -336,16 +330,15 @@ async function fetchGreenhouse(token){
     if (!res.ok) return [];
     const data = await res.json();
     return (data.jobs || [])
-      .filter(j => isValidJob(j.title))
+      .filter(j => matchesKeyword(j.title))
       .map(j => ({
         title: j.title,
         company: prettify(token),
         location: (j.location && j.location.name) || 'Location TBD',
         url: j.absolute_url,
         posted: j.updated_at,
-        tags: computeTags(j.title),
-      }))
-      .filter(j => j.tags.length > 0);
+        tags: ['Internship', ...classifyTracks(j.title)],
+      }));
   }catch(e){
     return [];
   }
@@ -357,16 +350,15 @@ async function fetchLever(token){
     if (!res.ok) return [];
     const data = await res.json();
     return (data || [])
-      .filter(j => isValidJob(j.text || ''))
+      .filter(j => matchesKeyword(j.text || ''))
       .map(j => ({
         title: j.text,
         company: prettify(token),
         location: (j.categories && j.categories.location) || 'Location TBD',
         url: j.hostedUrl,
         posted: j.createdAt ? new Date(j.createdAt).toISOString() : new Date().toISOString(),
-        tags: computeTags(j.text || ''),
-      }))
-      .filter(j => j.tags.length > 0);
+        tags: ['Internship', ...classifyTracks(j.text || '')],
+      }));
   }catch(e){
     return [];
   }
@@ -391,9 +383,9 @@ async function fetchRSSFeed(feed){
         location: 'See listing',
         url: link,
         posted: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
-        tags: computeTags(rawTitle),
+        tags: classifyTracks(rawTitle),
       };
-    }).filter(j => isValidJob(j.title) && j.tags.length > 0);
+    }).filter(j => j.tags.length > 0);
   }catch(e){
     return [];
   }
@@ -492,7 +484,7 @@ async function loadAll(){
   const live = [].concat(...ghResults, ...leverResults, ...rssResults);
   const manual = CONFIG.manualListings.map(l => ({ ...l, tags: l.tags || [] }));
 
-  allListings = dedupe([...manual, ...live]).filter(l => isValidJob(l.title) && l.tags.length > 0);
+  allListings = dedupe([...manual, ...live]);
   statusEl.textContent = `${allListings.length} listing${allListings.length === 1 ? '' : 's'} · ${live.length} pulled live`;
 
   buildTagFilters(allListings);
