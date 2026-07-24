@@ -200,8 +200,8 @@
 const CONFIG = {
   pageTitle: "INTERNSHIP<br>QUEST BOARD",
 
-  // Strictly targeting internships, co-ops, and apprenticeships while excluding senior/manager terms
-  keywords: ["intern", "internship", "co-op", "co op", "apprentice", "trainee", "artist", "3d"],
+  // Strict keywords ensuring only true training/internship roles pass through
+  keywords: ["intern", "internship", "co-op", "co op", "apprentice", "trainee"],
   excludedKeywords: ["senior", "sr", "lead", "director", "manager", "principal", "staff", "head of", "chief", "expert", "experienced"],
   staleAfterDays: 60,
 
@@ -251,26 +251,28 @@ const CONFIG = {
     },
   ],
 
-  curriculumTracks: {
+  // Specific keyword sets for isolated tag assignment
+  tagMatchRules: {
+    "Internship": [
+      "intern", "internship", "co-op", "co op", "apprentice", "trainee"
+    ],
     "3D Game Art": [
       "3d artist", "3d modeler", "modeling", "modeler", "texturing",
       "texture artist", "rigging", "technical artist", "environment artist",
       "character artist", "vfx", "animator", "animation",
-      "maya", "blender", "substance painter", "substance", "zbrush",
-      "unreal", "unity", "game engine", "3d",
+      "maya", "blender", "substance painter", "substance", "zbrush", "3d"
     ],
     "2D Game Art": [
       "2d artist", "illustrator", "concept artist", "ui artist", "ui/ux",
       "ux designer", "graphic design", "character design",
-      "environment design", "map design", "print production", "pixel art",
-      "2d character", "skybox", "game rules", "layout design", "photoshop",
+      "environment design", "map design", "pixel art",
+      "2d character", "skybox", "photoshop", "2d"
     ],
     "Digital Playspaces": [
       "experimental media", "live media", "alternate controller",
       "accessibility", "board game design", "tabletop design",
-      "installation", "interactive media", "physical computing",
-      "unreal", "unity",
-    ],
+      "installation", "interactive media", "physical computing"
+    ]
   },
 
   manualListings: [
@@ -297,11 +299,16 @@ function isValidJob(title){
   return CONFIG.keywords.some(k => t.includes(k));
 }
 
-function classifyTracks(text){
-  const t = text.toLowerCase();
-  return Object.entries(CONFIG.curriculumTracks)
-    .filter(([, keywords]) => keywords.some(k => t.includes(k)))
-    .map(([trackName]) => trackName);
+function computeTags(title){
+  const t = title.toLowerCase();
+  const assignedTags = [];
+  
+  for (const [tagName, keywords] of Object.entries(CONFIG.tagMatchRules)) {
+    if (keywords.some(k => t.includes(k))) {
+      assignedTags.push(tagName);
+    }
+  }
+  return assignedTags;
 }
 
 function rankClass(tags){
@@ -336,8 +343,9 @@ async function fetchGreenhouse(token){
         location: (j.location && j.location.name) || 'Location TBD',
         url: j.absolute_url,
         posted: j.updated_at,
-        tags: ['Internship', ...classifyTracks(j.title)],
-      }));
+        tags: computeTags(j.title),
+      }))
+      .filter(j => j.tags.length > 0);
   }catch(e){
     return [];
   }
@@ -356,8 +364,9 @@ async function fetchLever(token){
         location: (j.categories && j.categories.location) || 'Location TBD',
         url: j.hostedUrl,
         posted: j.createdAt ? new Date(j.createdAt).toISOString() : new Date().toISOString(),
-        tags: ['Internship', ...classifyTracks(j.text || '')],
-      }));
+        tags: computeTags(j.text || ''),
+      }))
+      .filter(j => j.tags.length > 0);
   }catch(e){
     return [];
   }
@@ -382,7 +391,7 @@ async function fetchRSSFeed(feed){
         location: 'See listing',
         url: link,
         posted: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
-        tags: classifyTracks(rawTitle),
+        tags: computeTags(rawTitle),
       };
     }).filter(j => isValidJob(j.title) && j.tags.length > 0);
   }catch(e){
@@ -483,7 +492,7 @@ async function loadAll(){
   const live = [].concat(...ghResults, ...leverResults, ...rssResults);
   const manual = CONFIG.manualListings.map(l => ({ ...l, tags: l.tags || [] }));
 
-  allListings = dedupe([...manual, ...live]).filter(l => isValidJob(l.title));
+  allListings = dedupe([...manual, ...live]).filter(l => isValidJob(l.title) && l.tags.length > 0);
   statusEl.textContent = `${allListings.length} listing${allListings.length === 1 ? '' : 's'} · ${live.length} pulled live`;
 
   buildTagFilters(allListings);
