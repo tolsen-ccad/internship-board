@@ -55,7 +55,6 @@
 
   .sub{ color: var(--text-muted); font-size: 14px; margin: 0; }
 
-  /* Navigation Styles */
   .board-nav {
     display: flex;
     gap: 12px;
@@ -220,7 +219,6 @@
     <h1 id="page-title">CAREER &amp; INTERNSHIP<br>QUEST BOARD</h1>
     <p class="sub">Live undergraduate internships and entry-level opportunities across games, vehicle, medical, & product design sectors.</p>
     
-    <!-- Unified Navigation Bar -->
     <nav class="board-nav">
       <a href="index.html" class="nav-item active">⚔ Internships &amp; Careers</a>
       <a href="gigs.html" class="nav-item">💎 Contract &amp; Gigs</a>
@@ -291,7 +289,7 @@ const CONFIG = {
     {
       name: "Games Jobs Direct",
       url: "https://www.gamesjobsdirect.com/rss", 
-    },
+    }
   ],
 
   curriculumTracks: {
@@ -424,7 +422,9 @@ async function fetchLever(token){
 
 async function fetchRSSFeed(feed){
   try{
-    const res = await fetch(feed.url);
+    // Wrapped with a public CORS proxy to allow browser evaluation securely
+    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(feed.url)}`;
+    const res = await fetch(proxyUrl);
     if (!res.ok) throw new Error();
     const xmlText = await res.text();
     const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
@@ -556,10 +556,11 @@ async function loadAll(){
     Promise.all(CONFIG.rssFeeds.map(fetchRSSFeed)),
   ]);
 
-  const live = [].concat(...ghResults, ...leverResults, ...rssResults);
+  // FIX: Apply keyword filter purely to live uncurated boards
+  const live = [].concat(...ghResults, ...leverResults, ...rssResults).filter(l => isValidJob(l.title));
   const manual = CONFIG.manualListings.map(l => ({ ...l, tags: l.tags || [] }));
 
-  allListings = dedupe([...manual, ...live]).filter(l => isValidJob(l.title));
+  allListings = dedupe([...manual, ...live]);
   statusEl.textContent = `${allListings.length} listing${allListings.length === 1 ? '' : 's'} · ${live.length} pulled live`;
 
   buildTagFilters(allListings);
