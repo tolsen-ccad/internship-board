@@ -62,7 +62,8 @@ async function fetchGoogleJobs() {
     return [];
   }
 
-  const query = "3d artist intern OR 3d modeler entry level OR junior 3d designer OR medical 3d intern OR product design junior";
+  // OPTIMIZED QUERY: Added '3d art apprentice' and 'game design apprentice' to target these rare listings explicitly
+  const query = "3d artist intern OR 3d modeler entry level OR junior 3d designer OR medical 3d intern OR product design junior OR 3d art apprentice OR game design apprentice";
   const url = `https://serpapi.com/search.json?engine=google_jobs&q=${encodeURIComponent(query)}&api_key=${apiKey}`;
 
   try {
@@ -94,8 +95,6 @@ async function fetchGoogleJobs() {
 
 async function updateBoard() {
   const newJobs = await fetchGoogleJobs();
-  
-  // Locate the index.html file paths relative to this script running inside /scripts/
   const indexPath = path.join(__dirname, '../index.html');
   
   if (!fs.existsSync(indexPath)) {
@@ -104,8 +103,6 @@ async function updateBoard() {
   }
 
   let indexHtml = fs.readFileSync(indexPath, 'utf8');
-
-  // Regex targeting the exact manualListings structural assignment inside index.html
   const regex = /manualListings:\s*\[([\s\S]*?)\]\s*,/;
   const match = indexHtml.match(regex);
 
@@ -114,7 +111,6 @@ async function updateBoard() {
     return;
   }
 
-  // Safely parse the array embedded in the static file using sandboxed Evaluation syntax
   let existingListings = [];
   try {
     existingListings = new Function(`return [${match[1]}]`)();
@@ -123,7 +119,6 @@ async function updateBoard() {
     return;
   }
 
-  // Merge the new jobs into the existing array, prioritizing keeping existing listings untouched
   const combinedListings = [...existingListings];
   newJobs.forEach(newJob => {
     const spaceDeduplicated = combinedListings.some(job => job.url === newJob.url);
@@ -132,7 +127,6 @@ async function updateBoard() {
     }
   });
 
-  // Automatically drop listings older than 60 days to prevent infinite file size scaling
   const cutoffDate = new Date();
   cutoffDate.setDate(cutoffDate.getDate() - 60);
 
@@ -141,10 +135,7 @@ async function updateBoard() {
     return postDate >= cutoffDate;
   });
 
-  // Generate clean string format back to the text code base
   const formattedArrayString = JSON.stringify(cleanActiveListings, null, 4);
-  
-  // Re-inject the updated listings structural format
   const updatedHtml = indexHtml.replace(regex, `manualListings: ${formattedArrayString},`);
   
   fs.writeFileSync(indexPath, updatedHtml, 'utf8');
