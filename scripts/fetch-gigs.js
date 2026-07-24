@@ -67,7 +67,15 @@ async function updateGigBoard() {
   const match = html.match(regex);
   if (!match) return;
 
-  let existingGigs = new Function(`return [${match[1]}]`)();
+  // SAFE PARSING WRAPPER
+  let existingGigs = [];
+  try {
+    existingGigs = new Function(`return [${match[1]}]`)();
+  } catch (e) {
+    console.error("Error parsing existing manual gigs within HTML source code:", e);
+    return; // Stop execution smoothly to prevent workflow crashes
+  }
+
   const combined = [...existingGigs];
 
   newGigs.forEach(gig => {
