@@ -19,7 +19,8 @@ const CURRICULUM_TRACKS = {
     "2d artist", "illustrator", "concept artist", "ui artist", "ui/ux",
     "ux designer", "graphic design", "character design",
     "environment design", "map design", "print production", "pixel art",
-    "2d character", "skybox", "game rules", "layout design", "photoshop"
+    "2d character", "skybox", "game rules", "layout design", "photoshop",
+    "board game art", "tabletop art"
   ],
   "Vehicle / Product Design": [
     "automotive", "vehicle", "product design", "industrial design", "cad", "solidworks", "keyshot"
@@ -29,7 +30,7 @@ const CURRICULUM_TRACKS = {
   ],
   "Digital Playspaces": [
     "experimental media", "live media", "alternate controller",
-    "accessibility", "board game design", "tabletop design",
+    "accessibility", "board game design", "tabletop design", "board game", "tabletop",
     "installation", "interactive media", "physical computing",
     "unreal", "unity"
   ]
@@ -62,8 +63,8 @@ async function fetchGoogleJobs() {
     return [];
   }
 
-  // OPTIMIZED QUERY: Added '3d art apprentice' and 'game design apprentice' to target these rare listings explicitly
-  const query = "3d artist intern OR 3d modeler entry level OR junior 3d designer OR medical 3d intern OR product design junior OR 3d art apprentice OR game design apprentice";
+  // OPTIMIZED QUERY: Added board game, tabletop, and 2d game art entry targets
+  const query = "3d artist intern OR 3d modeler entry level OR junior 3d designer OR product design junior OR 3d art apprentice OR game design apprentice OR board game intern OR tabletop junior OR 2d game art intern OR board game designer entry level";
   const url = `https://serpapi.com/search.json?engine=google_jobs&q=${encodeURIComponent(query)}&api_key=${apiKey}`;
 
   try {
