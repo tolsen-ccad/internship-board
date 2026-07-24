@@ -181,9 +181,9 @@
 
 <div class="wrap">
   <header>
-    <p class="eyebrow">// CCAD - GAME ART & DESIGN INTERSHIP BOARD</p>
+    <p class="eyebrow">// 3D MODELING, ART &amp; DESIGN</p>
     <h1 id="page-title">CAREER &amp; INTERNSHIP<br>QUEST BOARD</h1>
-    <p class="sub">Live Game Internships and Entry-Level Opportunities updated with each visit.</p>
+    <p class="sub">Live undergraduate internships and entry-level opportunities across games, vehicle, medical, & product design sectors.</p>
   </header>
 
   <div class="controls" id="tag-filters"></div>
@@ -197,14 +197,25 @@
   <div class="feed" id="feed"></div>
 </div>
 
-<footer>Sources refresh live from studio APIs, curated boards, and Instructor additions.<br>Made with love from Tay <3</footer>
+<footer>Sources refresh live from studio APIs & curated boards.</footer>
 
 <script>
 const CONFIG = {
   pageTitle: "CAREER &amp; INTERNSHIP<br>QUEST BOARD",
 
   keywords: ["intern", "internship", "co-op", "co op", "apprentice", "trainee", "entry level", "junior"],
-  excludedKeywords: ["senior", "sr", "lead", "director", "manager", "principal", "staff", "head of", "chief", "expert", "experienced"],
+  excludedKeywords: [
+    "senior", "sr", "lead", "director", "manager", "principal", "staff", "head of", "chief", "expert", "experienced",
+    // Off-scope domains — this board is for art/design skillsets, not
+    // business, marketing, or admin roles that occasionally show up in
+    // broad job-board searches.
+    "marketing", "market research", "business development", "sales",
+    "account manager", "account executive", "communications",
+    "public relations", "social media manager", "content marketing",
+    "seo", "human resources", "recruiter", "recruiting", "accounting",
+    "operations manager", "business analyst", "copywriter",
+    "customer success", "sales rep",
+  ],
   staleAfterDays: 60,
 
   greenhouseBoards: [
@@ -285,6 +296,15 @@ const CONFIG = {
     { title: "UI Art Intern", company: "Double Twizzle Games", location: "Remote", url: "https://workwithindies.com/careers/double-twizzle-games-ui-artist", posted: "2026-07-23", tags: ["2D Game Art", "Internship"] },
     { title: "Cinematic Art Apprentice", company: "Firefly Studios", location: "Remote", url: "https://workwithindies.com/careers/firefly-studios-cinematic-designer-artist", posted: "2026-07-23", tags: ["3D Game Art", "Internship"] },
   ],
+
+  // ==== AUTO-GENERATED-LISTINGS-START ====
+  // Populated by scripts/fetch-jobs.js on its scheduled run. Don't hand-edit
+  // this array — it gets fully replaced (not appended to) every run, so
+  // anything you type here will be overwritten. Use manualListings above
+  // for anything you want to add and keep permanently.
+  autoListings: [
+  ],
+  // ==== AUTO-GENERATED-LISTINGS-END ====
 };
 
 const feedEl = document.getElementById('feed');
@@ -302,7 +322,13 @@ function isValidJob(title){
   const t = title.toLowerCase();
   const hasExcluded = CONFIG.excludedKeywords.some(ex => t.includes(ex));
   if (hasExcluded) return false;
-  return CONFIG.keywords.some(k => t.includes(k));
+  const hasLevelKeyword = CONFIG.keywords.some(k => t.includes(k));
+  if (!hasLevelKeyword) return false;
+  // Positive requirement: the title has to actually match one of the
+  // curriculum tracks below. This is what keeps off-scope-but-technically-
+  // entry-level roles (e.g. a junior marketing coordinator) out, rather
+  // than relying only on catching them by name in excludedKeywords.
+  return classifyTracks(title).length > 0;
 }
 
 function determineJobTypeTag(title){
