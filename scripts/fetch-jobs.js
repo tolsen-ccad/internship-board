@@ -4,7 +4,7 @@ const path = require('path');
 // Keywords that must NOT be present in the title
 const EXCLUDED_KEYWORDS = [
   "senior", "sr", "lead", "director", "manager", 
-  "principal", "staff", "head of", "chief", "expert", "experienced"
+  "principal", "staff", "head of", "chief", "expert", "experienced", "junior", "entry"
 ];
 
 function isSeniorOrManagement(title) {
@@ -19,7 +19,8 @@ async function fetchGoogleJobs() {
     return [];
   }
 
-  const query = "game art intern OR design internship";
+  // Expanded query targeting 3D modeling/design internships across multiple sectors
+  const query = "3d artist intern OR 3d modeler internship OR medical 3d intern OR automotive design intern OR product design intern OR hard surface modeling intern";
   const url = `https://serpapi.com/search.json?engine=google_jobs&q=${encodeURIComponent(query)}&api_key=${apiKey}`;
 
   try {
@@ -28,7 +29,7 @@ async function fetchGoogleJobs() {
     
     if (!data.jobs_results) return [];
 
-    // Filter out any roles containing senior/management terms
+    // Filter out any roles containing senior/management or non-intern terms
     const filteredJobs = data.jobs_results.filter(job => !isSeniorOrManagement(job.title));
 
     return filteredJobs.map(job => ({
@@ -52,7 +53,7 @@ async function updateBoard() {
     return;
   }
 
-  console.log(`Successfully fetched and filtered ${newJobs.length} non-senior listings.`);
+  console.log(`Successfully fetched and filtered ${newJobs.length} alternative 3D modeling internship listings.`);
 }
 
 updateBoard();
