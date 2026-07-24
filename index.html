@@ -55,6 +55,41 @@
 
   .sub{ color: var(--text-muted); font-size: 14px; margin: 0; }
 
+  /* Navigation Styles */
+  .board-nav {
+    display: flex;
+    gap: 12px;
+    margin: 24px 0 12px;
+  }
+
+  .nav-item {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    background: rgba(42, 43, 87, 0.4);
+    border: 1px solid var(--border);
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .nav-item:hover {
+    border-color: var(--teal);
+    color: var(--text);
+    background: var(--surface);
+  }
+
+  .nav-item.active {
+    background: var(--surface);
+    border-color: var(--amber);
+    color: var(--amber);
+    box-shadow: 0 0 12px rgba(242, 184, 75, 0.15);
+  }
+
   .controls{
     display:flex; gap:10px; flex-wrap:wrap;
     margin: 20px 0 4px;
@@ -184,6 +219,12 @@
     <p class="eyebrow">// 3D MODELING, ART &amp; DESIGN</p>
     <h1 id="page-title">CAREER &amp; INTERNSHIP<br>QUEST BOARD</h1>
     <p class="sub">Live undergraduate internships and entry-level opportunities across games, vehicle, medical, & product design sectors.</p>
+    
+    <!-- Unified Navigation Bar -->
+    <nav class="board-nav">
+      <a href="index.html" class="nav-item active">⚔ Internships &amp; Careers</a>
+      <a href="gigs.html" class="nav-item">💎 Contract &amp; Gigs</a>
+    </nav>
   </header>
 
   <div class="controls" id="tag-filters"></div>
@@ -424,7 +465,7 @@ function dedupe(listings){
 
 function buildTagFilters(listings){
   const tagSet = new Set();
-  const hiddenTags = ["Medical / Simulation"]; // Tags that will appear on cards but won't be clickable filter buttons
+  const hiddenTags = ["Medical / Simulation"];
 
   listings.forEach(l => l.tags.forEach(t => {
     if (!hiddenTags.includes(t)) tagSet.add(t);
