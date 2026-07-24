@@ -243,7 +243,14 @@ const CONFIG = {
   pageTitle: "GAME ART GIG &amp; CONTRACT<br>QUEST BOARD",
 
   keywords: ["contract", "contractor", "freelance", "freelancer", "commission", "short term", "temporary", "project-based", "hiring", "[hiring]", "looking for artist", "lf artist", "lfa"],
-  excludedKeywords: ["senior", "sr", "lead", "director", "manager", "full time", "permanent", "[for hire]", "l4h"],
+  excludedKeywords: [
+    "senior", "sr", "lead", "director", "manager", "full time", "permanent", "[for hire]", "l4h",
+    // Off-scope roles that occasionally surface on studio ATS boards
+    // alongside art/design contract postings.
+    "engineer", "engineering", "producer", "production coordinator",
+    "cloud infrastructure", "devops", "site reliability",
+    "backend developer", "backend engineer",
+  ],
   staleAfterDays: 30,
 
   // Cleaned to remove deprecated endpoints that throw 404s
@@ -340,7 +347,14 @@ function isValidJob(title){
   const t = title.toLowerCase();
   const hasExcluded = CONFIG.excludedKeywords.some(ex => t.includes(ex));
   if (hasExcluded) return false;
-  return CONFIG.keywords.some(k => t.includes(k)) || t.includes('[hiring]') || t.includes('lf ');
+  const hasGigKeyword = CONFIG.keywords.some(k => t.includes(k)) || t.includes('[hiring]') || t.includes('lf ');
+  if (!hasGigKeyword) return false;
+  // Positive requirement: the title has to actually match one of the
+  // curriculum tracks below. Without this, any live Greenhouse/Lever/RSS
+  // result containing a word like "contract" or "hiring" passes through
+  // regardless of field — which is how Cloud Infrastructure Engineer,
+  // Producer, and similar off-scope roles were getting in.
+  return classifyTracks(title).length > 0;
 }
 
 function determineJobTypeTag(title){
