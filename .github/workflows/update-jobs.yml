@@ -19,14 +19,16 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Run Job Scraper Script
+      - name: Run Job and Gig Scraper Scripts
         env:
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
-        run: node scripts/fetch-jobs.js
+        run: |
+          node scripts/fetch-jobs.js
+          node scripts/fetch-gigs.js
 
       - name: Commit and Push Changes
         run: |
           git config --global user.name 'Job Bot'
           git config --global user.email 'bot@users.noreply.github.com'
-          git add index.html
-          git diff --quiet && git diff --cached --quiet || (git commit -m "Auto-update manualListings with daily scrape [skip ci]" && git push)
+          git add index.html gigs.html
+          git diff --quiet && git diff --cached --quiet || (git commit -m "Auto-update listings and gigs with latest scrape [skip ci]" && git push)
