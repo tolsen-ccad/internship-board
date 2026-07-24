@@ -55,7 +55,6 @@
 
   .sub{ color: var(--text-muted); font-size: 14px; margin: 0; }
 
-  /* Navigation Styles */
   .board-nav {
     display: flex;
     gap: 12px;
@@ -220,7 +219,6 @@
     <h1 id="page-title">GAME ART GIG &amp; CONTRACT<br>QUEST BOARD</h1>
     <p class="sub">Short-term contracts, freelance gigs, and asset commissions to help students build pipeline experience and strengthen their portfolios.</p>
     
-    <!-- Unified Navigation Bar -->
     <nav class="board-nav">
       <a href="index.html" class="nav-item">⚔ Internships &amp; Careers</a>
       <a href="gigs.html" class="nav-item active">💎 Contract &amp; Gigs</a>
@@ -430,19 +428,14 @@ async function fetchLever(token){
 
 async function fetchRSSFeed(feed){
   try{
-    let url = feed.url;
-    
-    // Wrap Reddit feeds with a public CORS proxy to safely fetch without browser origin blocks
-    if (url.includes('reddit.com')) {
-      url = `https://corsproxy.io/?${encodeURIComponent(url)}`;
-    }
+    // FIX: Route ALL client-side feeds through CORS proxy to prevent browser errors
+    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(feed.url)}`;
 
-    const res = await fetch(url);
+    const res = await fetch(proxyUrl);
     if (!res.ok) throw new Error();
     const xmlText = await res.text();
     const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
     
-    // Support standard RSS (<item>) and Reddit/Atom structures (<entry>)
     const items = [...xml.querySelectorAll('item')];
     const entries = [...xml.querySelectorAll('entry')];
     const targetNodes = items.length ? items : entries;
@@ -450,13 +443,11 @@ async function fetchRSSFeed(feed){
     return targetNodes.map(node => {
       const rawTitle = node.querySelector('title')?.textContent?.trim() || '';
       
-      // Handle standard XML link text node vs Atom link element attribute href
       let link = node.querySelector('link')?.textContent?.trim() || node.querySelector('guid')?.textContent?.trim() || '';
       if (!link && node.querySelector('link')) {
         link = node.querySelector('link').getAttribute('href') || '';
       }
       
-      // Handle pubDate vs updated (Atom structure)
       const pubDate = node.querySelector('pubDate')?.textContent || node.querySelector('updated')?.textContent || '';
       
       return {
@@ -581,10 +572,11 @@ async function loadAll(){
     Promise.all(CONFIG.rssFeeds.map(fetchRSSFeed)),
   ]);
 
-  const live = [].concat(...ghResults, ...leverResults, ...rssResults);
+  // FIX: Apply keyword filter purely to live uncurated boards
+  const live = [].concat(...ghResults, ...leverResults, ...rssResults).filter(l => isValidJob(l.title));
   const manual = CONFIG.manualListings.map(l => ({ ...l, tags: l.tags || [] }));
 
-  allListings = dedupe([...manual, ...live]).filter(l => isValidJob(l.title));
+  allListings = dedupe([...manual, ...live]);
   statusEl.textContent = `${allListings.length} listing${allListings.length === 1 ? '' : 's'} · ${live.length} pulled live`;
 
   buildTagFilters(allListings);
