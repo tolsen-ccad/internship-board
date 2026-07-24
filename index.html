@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Internship Quest Board</title>
+<title>Internship & Entry-Level Quest Board</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -19,6 +19,7 @@
     --amber: #f2b84b;
     --teal: #4fd1c5;
     --rose: #ef7a9a;
+    --purple: #9f7aea;
   }
 
   *{ box-sizing: border-box; }
@@ -132,11 +133,12 @@
     border-radius: 10px;
     display:flex; align-items:center; justify-content:center;
     font-family: 'Press Start 2P', monospace;
-    font-size: 12px;
+    font-size: 11px;
     background: linear-gradient(160deg, var(--amber), #c98d1e);
     color: #241a05;
   }
   .rank.co-op{ background: linear-gradient(160deg, var(--teal), #1f8a80); color:#052622; }
+  .rank.entry { background: linear-gradient(160deg, var(--purple), #6b46c1); color:#fff; }
 
   .card-body{ flex:1; min-width:0; }
   .card-title{ font-size: 15px; font-weight:600; margin: 0 0 3px; }
@@ -154,6 +156,7 @@
     border: 1px solid var(--border);
     color: var(--text-muted);
   }
+  .tag.type-badge { border-color: var(--purple); color: var(--purple); background: rgba(159,122,234,0.1); font-weight:600; }
   .tag.new{ border-color: var(--teal); color: var(--teal); }
   .tag.stale-badge{
     border-color: var(--rose);
@@ -178,13 +181,13 @@
 
 <div class="wrap">
   <header>
-    <p class="eyebrow">// GAME ART &amp; DESIGN</p>
-    <h1 id="page-title">INTERNSHIP<br>QUEST BOARD</h1>
-    <p class="sub">Live AAA & Indie Studios, as well as alternative internship listings, pulled fresh each visit.</p>
+    <p class="eyebrow">// 3D MODELING, ART &amp; DESIGN</p>
+    <h1 id="page-title">CAREER &amp; INTERNSHIP<br>QUEST BOARD</h1>
+    <p class="sub">Live undergraduate internships and entry-level opportunities across games, vehicle, medical, & product design sectors.</p>
   </header>
 
   <div class="controls" id="tag-filters"></div>
-  <input class="search" id="search-input" type="text" placeholder="Search by title, studio, or location…">
+  <input class="search" id="search-input" type="text" placeholder="Search by title, studio/company, or location…">
 
   <div class="status">
     <span id="status-text">Loading listings…</span>
@@ -194,15 +197,15 @@
   <div class="feed" id="feed"></div>
 </div>
 
-<footer>Sources refresh live from studio APIs & Instructor curated boards <3</footer>
+<footer>Sources refresh live from studio APIs & curated boards.</footer>
 
 <script>
 const CONFIG = {
-  pageTitle: "INTERNSHIP<br>QUEST BOARD",
+  pageTitle: "CAREER &amp; INTERNSHIP<br>QUEST BOARD",
 
-  // Strict targeting exclusively for internships/co-ops/apprenticeships
-  keywords: ["intern", "internship", "co-op", "co op", "apprentice", "trainee"],
-  excludedKeywords: ["senior", "sr", "lead", "director", "manager", "principal", "staff", "head of", "chief", "expert", "experienced", "junior", "entry"],
+  // Target both internships/co-ops and entry-level/junior designations
+  keywords: ["intern", "internship", "co-op", "co op", "apprentice", "trainee", "entry level", "junior"],
+  excludedKeywords: ["senior", "sr", "lead", "director", "manager", "principal", "staff", "head of", "chief", "expert", "experienced"],
   staleAfterDays: 60,
 
   greenhouseBoards: [
@@ -265,6 +268,12 @@ const CONFIG = {
       "environment design", "map design", "print production", "pixel art",
       "2d character", "skybox", "game rules", "layout design", "photoshop",
     ],
+    "Vehicle / Product Design": [
+      "automotive", "vehicle", "product design", "industrial design", "cad", "solidworks", "keyshot",
+    ],
+    "Medical / Simulation": [
+      "medical", "biomedical", "simulation", "prosthetics", "anatomical",
+    ],
     "Digital Playspaces": [
       "experimental media", "live media", "alternate controller",
       "accessibility", "board game design", "tabletop design",
@@ -275,7 +284,7 @@ const CONFIG = {
 
   manualListings: [
     { title: "UI Art Intern", company: "Double Twizzle Games", location: "Remote", url: "https://www.workwithindies.com/careers/double-twizzle-games-ui-artist", posted: "2026-07-23", tags: ["2D Game Art", "Internship"] },
-    { title: "Cinematic Art Apprentice", company: "Firefly Studios", location: "Remote", url: "https://www.workwithindies.com/careers/firefly-studios-cinematic-designer-artist", posted: "2026-07-23", tags: ["3D Game Art", "Internship"] },
+    { title: "Junior 3D Modeler", company: "SimulCraft Medical", location: "Remote", url: "https://www.workwithindies.com/careers/firefly-studios-cinematic-designer-artist", posted: "2026-07-23", tags: ["Medical / Simulation", "Entry-Level"] },
   ],
 };
 
@@ -297,6 +306,14 @@ function isValidJob(title){
   return CONFIG.keywords.some(k => t.includes(k));
 }
 
+function determineJobTypeTag(title){
+  const t = title.toLowerCase();
+  if (t.includes('co-op') || t.includes('co op')) return 'Co-Op';
+  if (t.includes('intern') || t.includes('internship') || t.includes('apprentice') || t.includes('trainee')) return 'Internship';
+  if (t.includes('entry') || t.includes('junior')) return 'Entry-Level';
+  return 'Internship';
+}
+
 function classifyTracks(text){
   const t = text.toLowerCase();
   return Object.entries(CONFIG.curriculumTracks)
@@ -307,12 +324,14 @@ function classifyTracks(text){
 function rankClass(tags){
   const t = tags.join(' ').toLowerCase();
   if (t.includes('co-op') || t.includes('co op')) return 'co-op';
+  if (t.includes('entry-level')) return 'entry';
   return '';
 }
 
 function rankLabel(tags){
   const cls = rankClass(tags);
   if (cls === 'co-op') return 'CO';
+  if (cls === 'entry') return 'EL';
   return 'IN';
 }
 
@@ -336,7 +355,7 @@ async function fetchGreenhouse(token){
         location: (j.location && j.location.name) || 'Location TBD',
         url: j.absolute_url,
         posted: j.updated_at,
-        tags: ['Internship', ...classifyTracks(j.title)],
+        tags: [determineJobTypeTag(j.title), ...classifyTracks(j.title)],
       }));
   }catch(e){
     return [];
@@ -356,7 +375,7 @@ async function fetchLever(token){
         location: (j.categories && j.categories.location) || 'Location TBD',
         url: j.hostedUrl,
         posted: j.createdAt ? new Date(j.createdAt).toISOString() : new Date().toISOString(),
-        tags: ['Internship', ...classifyTracks(j.text || '')],
+        tags: [determineJobTypeTag(j.text || ''), ...classifyTracks(j.text || '')],
       }));
   }catch(e){
     return [];
@@ -382,9 +401,9 @@ async function fetchRSSFeed(feed){
         location: 'See listing',
         url: link,
         posted: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
-        tags: classifyTracks(rawTitle),
+        tags: [determineJobTypeTag(rawTitle), ...classifyTracks(rawTitle)],
       };
-    }).filter(j => isValidJob(j.title) && j.tags.includes('Internship'));
+    }).filter(j => isValidJob(j.title));
   }catch(e){
     return [];
   }
@@ -408,7 +427,17 @@ function buildTagFilters(listings){
   const tagSet = new Set();
   listings.forEach(l => l.tags.forEach(t => tagSet.add(t)));
   tagFiltersEl.innerHTML = '';
-  [...tagSet].sort().forEach(tag => {
+  
+  // Sort with Type badges first (Internship, Entry-Level, Co-Op) if present
+  const sortedTags = [...tagSet].sort((a, b) => {
+    const priorities = { "Internship": 1, "Entry-Level": 2, "Co-Op": 3 };
+    const pA = priorities[a] || 99;
+    const pB = priorities[b] || 99;
+    if (pA !== pB) return pA - pB;
+    return a.localeCompare(b);
+  });
+
+  sortedTags.forEach(tag => {
     const chip = document.createElement('div');
     chip.className = 'chip';
     chip.textContent = tag;
@@ -454,7 +483,10 @@ function render(){
         <p class="card-title">${escapeHtml(l.title)}</p>
         <p class="card-meta">${escapeHtml(l.company)} · ${escapeHtml(l.location)} · ${dateLabel}</p>
         <div class="tags">
-          ${l.tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
+          ${l.tags.map(t => {
+            const isType = ["Internship", "Entry-Level", "Co-Op"].includes(t);
+            return `<span class="tag ${isType ? 'type-badge' : ''}">${escapeHtml(t)}</span>`;
+          }).join('')}
           ${newBadge}
           ${staleBadge}
         </div>
