@@ -267,6 +267,30 @@
     font-style: italic;
   }
 
+  .dice-roll{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    margin: 36px 0 4px;
+  }
+  .dice-svg{ overflow: visible; }
+  .dice-frame{ display: none; }
+  .dice-frame.active{ display: block; }
+  .dice-frame rect{
+    fill: none;
+    stroke: var(--teal);
+    stroke-width: 3;
+    stroke-linejoin: round;
+  }
+  .dice-frame circle{ fill: var(--teal); }
+  .dice-caption{
+    font-size: 11px;
+    color: var(--text-muted);
+    opacity: 0.7;
+    letter-spacing: 0.03em;
+  }
+
   footer{
     margin-top: 30px;
     font-size: 11px;
@@ -336,6 +360,279 @@
     </div>
   </div>
 </div>
+
+  <div class="dice-roll" aria-hidden="true">
+    <svg viewBox="0 0 120 120" width="72" height="72" class="dice-svg">
+      <g class="dice-frames">
+      <g class="dice-frame active" data-frame="0">
+        <g transform="translate(0 -0.0) rotate(0.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="30" cy="30" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="1">
+        <g transform="translate(0 -1.2) rotate(15.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="30" cy="30" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="2">
+        <g transform="translate(0 -2.3) rotate(30.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="30" cy="30" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="3">
+        <g transform="translate(0 -3.4) rotate(45.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="30" cy="30" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="4">
+        <g transform="translate(0 -4.5) rotate(60.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="5">
+        <g transform="translate(0 -5.5) rotate(75.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="6">
+        <g transform="translate(0 -6.4) rotate(90.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="7">
+        <g transform="translate(0 -7.1) rotate(105.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="8">
+        <g transform="translate(0 -7.8) rotate(120.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="30" cy="30" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="9">
+        <g transform="translate(0 -8.3) rotate(135.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="30" cy="30" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="10">
+        <g transform="translate(0 -8.7) rotate(150.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="30" cy="30" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="11">
+        <g transform="translate(0 -8.9) rotate(165.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="30" cy="30" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="12">
+        <g transform="translate(0 -9.0) rotate(180.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="15" r="4.2" />
+            <circle cx="15" cy="45" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="13">
+        <g transform="translate(0 -8.9) rotate(195.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="15" r="4.2" />
+            <circle cx="15" cy="45" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="14">
+        <g transform="translate(0 -8.7) rotate(210.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="15" r="4.2" />
+            <circle cx="15" cy="45" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="15">
+        <g transform="translate(0 -8.3) rotate(225.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="15" r="4.2" />
+            <circle cx="15" cy="45" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="16">
+        <g transform="translate(0 -7.8) rotate(240.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="15" r="4.2" />
+            <circle cx="30" cy="30" r="4.2" />
+            <circle cx="15" cy="45" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="17">
+        <g transform="translate(0 -7.1) rotate(255.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="15" r="4.2" />
+            <circle cx="30" cy="30" r="4.2" />
+            <circle cx="15" cy="45" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="18">
+        <g transform="translate(0 -6.4) rotate(270.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="15" r="4.2" />
+            <circle cx="30" cy="30" r="4.2" />
+            <circle cx="15" cy="45" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="19">
+        <g transform="translate(0 -5.5) rotate(285.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="15" r="4.2" />
+            <circle cx="30" cy="30" r="4.2" />
+            <circle cx="15" cy="45" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="20">
+        <g transform="translate(0 -4.5) rotate(300.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="15" r="4.2" />
+            <circle cx="15" cy="30" r="4.2" />
+            <circle cx="45" cy="30" r="4.2" />
+            <circle cx="15" cy="45" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="21">
+        <g transform="translate(0 -3.4) rotate(315.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="15" r="4.2" />
+            <circle cx="15" cy="30" r="4.2" />
+            <circle cx="45" cy="30" r="4.2" />
+            <circle cx="15" cy="45" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="22">
+        <g transform="translate(0 -2.3) rotate(330.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="15" r="4.2" />
+            <circle cx="15" cy="30" r="4.2" />
+            <circle cx="45" cy="30" r="4.2" />
+            <circle cx="15" cy="45" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      <g class="dice-frame" data-frame="23">
+        <g transform="translate(0 -1.2) rotate(345.0 60 60)">
+          <rect x="30" y="30" width="60" height="60" rx="11" />
+          <g transform="translate(30 30)">
+            <circle cx="15" cy="15" r="4.2" />
+            <circle cx="45" cy="15" r="4.2" />
+            <circle cx="15" cy="30" r="4.2" />
+            <circle cx="45" cy="30" r="4.2" />
+            <circle cx="15" cy="45" r="4.2" />
+            <circle cx="45" cy="45" r="4.2" />
+          </g>
+        </g>
+      </g>
+      </g>
+    </svg>
+    <p class="dice-caption">// may the odds roll in your favor</p>
+  </div>
+
+  <script>
+  (function(){
+    var frames = document.querySelectorAll('.dice-frame');
+    if (!frames.length) return;
+    var current = 0;
+    setInterval(function(){
+      frames[current].classList.remove('active');
+      current = (current + 1) % frames.length;
+      frames[current].classList.add('active');
+    }, 125); // 24 frames × 125ms = 3s full loop
+  })();
+  </script>
 
 <footer>Sources refresh live from studio APIs & curated boards. <br> Made with love from Tay <3</footer>
 
