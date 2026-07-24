@@ -5,30 +5,45 @@ on:
     - cron: '*/30 * * * *' # Runs every 30 minutes
   workflow_dispatch: # Allows manual trigger from GitHub UI
 
+# Prevents concurrent deployment conflicts by queueing runs safely
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
   update-board:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Needed to commit changes back to the repo
+      contents: write  # Needed to commit changes back to the repo
+      pages: write     # Needed to deploy to GitHub Pages
+      id-token: write  # Needed for secure GitHub Pages authentication
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v4[cite: 6]
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4[cite: 6]
         with:
-          node-version: '20'
+          node-version: '20'[cite: 6]
 
       - name: Run Job and Gig Scraper Scripts
         env:
-          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+          SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}[cite: 6]
         run: |
           node scripts/fetch-jobs.js
           node scripts/fetch-gigs.js
 
       - name: Commit and Push Changes
         run: |
-          git config --global user.name 'Job Bot'
-          git config --global user.email 'bot@users.noreply.github.com'
-          git add index.html gigs.html
-          git diff --quiet && git diff --cached --quiet || (git commit -m "Auto-update listings and gigs with latest scrape [skip ci]" && git push)
+          git config --global user.name 'Job Bot'[cite: 6]
+          git config --global user.email 'bot@users.noreply.github.com'[cite: 6]
+          git add index.html gigs.html[cite: 6]
+          git diff --quiet && git diff --cached --quiet || (git commit -m "Auto-update listings and gigs with latest scrape [skip ci]" && git push)[cite: 6]
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.' # Bundles the entire root directory (both HTML files)
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v5
