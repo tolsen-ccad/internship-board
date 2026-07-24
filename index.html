@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Internship Quest Board</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!--
+  =========================================================================
+  GAME ART & DESIGN — INTERNSHIP QUEST BOARD
+  =========================================================================
+  HOW THIS WORKS
+  This is a standalone page. It does NOT run inside Notion directly —
+  Notion strips <script> tags from its own pages. Instead:
+
+    1. Host this file somewhere free & static: GitHub Pages, Netlify,
+       Vercel, or Cloudflare Pages all work in a few minutes.
+    2. In your Notion page, add an "Embed" block (not "Code") and paste
+       the hosted URL (e.g. https://yourname.github.io/intern-board/).
+       Notion will render it in an iframe, and the JS runs fine there.
+
+  WHERE THE LISTINGS COME FROM
+  Two live sources, both free & keyless:
+    - Greenhouse Job Board API: https://boards-api.greenhouse.io/v1/boards/{token}/jobs
+      Find a studio's token in their careers URL:
+      boards.greenhouse.io/{token}  ->  token goes in CONFIG.greenhouseBoards
+    - Lever Postings API: https://api.lever.co/v0/postings/{token}
+      Find it the same way: jobs.lever.co/{token}
+
+  There's no public directory of "which studios use which ATS" — you
+  build the list as you find studios that post game art/design roles.
+  For studios that don't use Greenhouse/Lever (a lot of the industry —
+  check job boards like Hitmarker, Games Jobs Direct, or a studio's own
+  careers page by hand), just add them to CONFIG.manualListings below.
+  That list is the one you'll maintain most often.
+
+  Everything below the CONFIG object you can leave alone.
+  =========================================================================
+-->
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+
+  :root{
+    --bg: #1b1c34;
+    --bg-2: #23244a;
+    --surface: #2a2b57;
+    --surface-hover: #33356b;
+    --border: #3c3e73;
+    --text: #e9e8f5;
+    --text-muted: #a5a3c9;
+    --amber: #f2b84b;
+    --teal: #4fd1c5;
+    --rose: #ef7a9a;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: radial-gradient(circle at 20% 0%, var(--bg-2), var(--bg) 60%);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    padding: 28px 20px 60px;
+    min-height: 100vh;
+  }
+
+  .wrap{ max-width: 760px; margin: 0 auto; }
+
+  header{ margin-bottom: 22px; }
+
+  .eyebrow{
+    font-family: 'Press Start 2P', monospace;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    color: var(--teal);
+    margin: 0 0 10px;
+  }
+
+  h1{
+    font-family: 'Press Start 2P', monospace;
+    font-size: 18px;
+    line-height: 1.6;
+    margin: 0 0 8px;
+    color: var(--amber);
+    text-shadow: 0 0 18px rgba(242,184,75,0.25);
+  }
+
+  .sub{ color: var(--text-muted); font-size: 14px; margin: 0; }
+
+  .controls{
+    display:flex; gap:10px; flex-wrap:wrap;
+    margin: 20px 0 4px;
+  }
+
+  .chip{
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 13px;
+    padding: 7px 13px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+  .chip:hover{ border-color: var(--teal); color: var(--text); }
+  .chip.active{
+    background: var(--teal);
+    border-color: var(--teal);
+    color: #0c1220;
+    font-weight: 600;
+  }
+
+  .search{
+    width:100%;
+    margin-top: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 14px;
+  }
+  .search:focus{ outline: none; border-color: var(--amber); }
+
+  .status{
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 16px 2px 10px;
+    display:flex;
+    justify-content: space-between;
+    align-items:center;
+  }
+
+  .status button{
+    background:none; border:1px solid var(--border); color: var(--text-muted);
+    border-radius: 8px; padding: 4px 10px; font-size: 12px; cursor:pointer;
+    font-family:inherit;
+  }
+  .status button:hover{ color: var(--text); border-color: var(--teal); }
+
+  .feed{ display:flex; flex-direction:column; gap: 12px; }
+
+  .card{
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    display:flex;
+    gap: 14px;
+    align-items:flex-start;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+    text-decoration:none;
+    color: inherit;
+  }
+  .card:hover{
+    border-color: var(--amber);
+    transform: translateY(-1px);
+  }
+
+  .rank{
+    flex: 0 0 auto;
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display:flex; align-items:center; justify-content:center;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 12px;
+    background: linear-gradient(160deg, var(--amber), #c98d1e);
+    color: #241a05;
+  }
+  .rank.co-op{ background: linear-gradient(160deg, var(--teal), #1f8a80); color:#052622; }
+  .rank.junior{ background: linear-gradient(160deg, var(--rose), #b23b5e); color:#2b0512; }
+
+  .card-body{ flex:1; min-width:0; }
+
+  .card-title{ font-size: 15px; font-weight:600; margin: 0 0 3px; }
+
+  .card-meta{
+    font-size: 13px; color: var(--text-muted); margin: 0 0 8px;
+    display:flex; gap:8px; flex-wrap:wrap;
+  }
+
+  .tags{ display:flex; gap:6px; flex-wrap:wrap; }
+  .tag{
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+  .tag.new{ border-color: var(--teal); color: var(--teal); }
+
+  .empty, .loading{
+    text-align:center;
+    padding: 50px 20px;
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  footer{
+    margin-top: 30px;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align:center;
+    opacity: 0.7;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .card{ transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">// GAME ART &amp; DESIGN</p>
+    <h1 id="page-title">INTERNSHIP<br>QUEST BOARD</h1>
+    <p class="sub">Live internship & entry-level listings, pulled fresh each visit.</p>
+  </header>
+
+  <div class="controls" id="tag-filters"></div>
+  <input class="search" id="search-input" type="text" placeholder="Search by title, studio, or location…">
+
+  <div class="status">
+    <span id="status-text">Loading listings…</span>
+    <button id="refresh-btn">↻ Refresh</button>
+  </div>
+
+  <div class="feed" id="feed"></div>
+</div>
+
+<footer>Sources refresh live from each studio's job board. Manually-added listings are curated by your instructor.</footer>
+
+<script>
+/* =======================================================================
+   CONFIG — this is the only section you should need to edit
+   ======================================================================= */
+const CONFIG = {
+  pageTitle: "INTERNSHIP<br>QUEST BOARD",
+
+  // Only listings whose title contains one of these (case-insensitive)
+  // are pulled in from Greenhouse/Lever. Manual listings bypass this.
+  keywords: ["intern", "internship", "co-op", "co op", "apprentice"],
+
+  // Greenhouse board tokens. Find one by visiting a studio's careers
+  // page — if the URL looks like boards.greenhouse.io/SOMENAME, use
+  // SOMENAME here. Example (verify before relying on it):
+  greenhouseBoards: [
+    // "somestudio",
+  ],
+
+  // Lever tokens, from jobs.lever.co/SOMENAME
+  leverBoards: [
+    // "somestudio",
+  ],
+
+  // Hand-added listings — for studios without a Greenhouse/Lever API,
+  // or anything you found on a board like Hitmarker/Games Jobs Direct.
+  // This is the list you'll edit most. Copy the block to add more.
+  manualListings: [
+    {
+      title: "Example — 3D Environment Art Intern",
+      company: "Sample Games Studio",
+      location: "Remote",
+      url: "#",
+      posted: "2026-07-01",
+      tags: ["Art", "Internship"],
+    },
+    {
+      title: "Example — UX/UI Design Co-op",
+      company: "Sample Interactive",
+      location: "Austin, TX",
+      url: "#",
+      posted: "2026-06-20",
+      tags: ["Design", "Co-op"],
+    },
+    // Delete the two examples above once you've added real listings.
+  ],
+};
+/* ======================================================================= */
+
+const feedEl = document.getElementById('feed');
+const statusEl = document.getElementById('status-text');
+const tagFiltersEl = document.getElementById('tag-filters');
+const searchInput = document.getElementById('search-input');
+const refreshBtn = document.getElementById('refresh-btn');
+
+document.getElementById('page-title').innerHTML = CONFIG.pageTitle;
+
+let allListings = [];
+let activeTag = null;
+
+function matchesKeyword(title){
+  const t = title.toLowerCase();
+  return CONFIG.keywords.some(k => t.includes(k));
+}
+
+function rankClass(tags){
+  const t = tags.join(' ').toLowerCase();
+  if (t.includes('co-op') || t.includes('co op')) return 'co-op';
+  if (t.includes('junior') || t.includes('entry')) return 'junior';
+  return '';
+}
+
+function rankLabel(tags){
+  const cls = rankClass(tags);
+  if (cls === 'co-op') return 'CO';
+  if (cls === 'junior') return 'JR';
+  return 'IN';
+}
+
+function isRecent(dateStr){
+  const posted = new Date(dateStr);
+  const days = (Date.now() - posted.getTime()) / (1000*60*60*24);
+  return days <= 14;
+}
+
+async function fetchGreenhouse(token){
+  try{
+    const res = await fetch(`https://boards-api.greenhouse.io/v1/boards/${token}/jobs?content=true`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.jobs || [])
+      .filter(j => matchesKeyword(j.title))
+      .map(j => ({
+        title: j.title,
+        company: prettify(token),
+        location: (j.location && j.location.name) || 'Location TBD',
+        url: j.absolute_url,
+        posted: j.updated_at,
+        tags: ['Internship'],
+      }));
+  }catch(e){
+    console.warn(`Greenhouse board "${token}" failed to load:`, e);
+    return [];
+  }
+}
+
+async function fetchLever(token){
+  try{
+    const res = await fetch(`https://api.lever.co/v0/postings/${token}?mode=json`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data || [])
+      .filter(j => matchesKeyword(j.text || ''))
+      .map(j => ({
+        title: j.text,
+        company: prettify(token),
+        location: (j.categories && j.categories.location) || 'Location TBD',
+        url: j.hostedUrl,
+        posted: j.createdAt ? new Date(j.createdAt).toISOString() : new Date().toISOString(),
+        tags: ['Internship'],
+      }));
+  }catch(e){
+    console.warn(`Lever board "${token}" failed to load:`, e);
+    return [];
+  }
+}
+
+function prettify(token){
+  return token.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function dedupe(listings){
+  const seen = new Set();
+  return listings.filter(l => {
+    const key = l.url || `${l.title}-${l.company}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function buildTagFilters(listings){
+  const tagSet = new Set();
+  listings.forEach(l => l.tags.forEach(t => tagSet.add(t)));
+  tagFiltersEl.innerHTML = '';
+  [...tagSet].sort().forEach(tag => {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    chip.textContent = tag;
+    chip.onclick = () => {
+      activeTag = activeTag === tag ? null : tag;
+      render();
+      [...tagFiltersEl.children].forEach(c => c.classList.toggle('active', c.textContent === activeTag));
+    };
+    tagFiltersEl.appendChild(chip);
+  });
+}
+
+function render(){
+  const query = searchInput.value.trim().toLowerCase();
+
+  let filtered = allListings.filter(l => {
+    const matchesTag = !activeTag || l.tags.includes(activeTag);
+    const haystack = `${l.title} ${l.company} ${l.location}`.toLowerCase();
+    const matchesSearch = !query || haystack.includes(query);
+    return matchesTag && matchesSearch;
+  });
+
+  filtered.sort((a,b) => new Date(b.posted) - new Date(a.posted));
+
+  feedEl.innerHTML = '';
+
+  if (filtered.length === 0){
+    feedEl.innerHTML = `<div class="empty">No listings match right now. Try clearing filters, or check back soon — new quests post often.</div>`;
+    return;
+  }
+
+  filtered.forEach(l => {
+    const a = document.createElement('a');
+    a.href = l.url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    a.className = 'card';
+
+    const dateLabel = new Date(l.posted).toLocaleDateString(undefined, { month:'short', day:'numeric' });
+    const newBadge = isRecent(l.posted) ? '<span class="tag new">NEW</span>' : '';
+
+    a.innerHTML = `
+      <div class="rank ${rankClass(l.tags)}">${rankLabel(l.tags)}</div>
+      <div class="card-body">
+        <p class="card-title">${escapeHtml(l.title)}</p>
+        <p class="card-meta">${escapeHtml(l.company)} · ${escapeHtml(l.location)} · ${dateLabel}</p>
+        <div class="tags">
+          ${l.tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
+          ${newBadge}
+        </div>
+      </div>
+    `;
+    feedEl.appendChild(a);
+  });
+}
+
+function escapeHtml(str){
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+async function loadAll(){
+  statusEl.textContent = 'Loading listings…';
+  feedEl.innerHTML = '<div class="loading">Fetching the latest quests…</div>';
+
+  const [ghResults, leverResults] = await Promise.all([
+    Promise.all(CONFIG.greenhouseBoards.map(fetchGreenhouse)),
+    Promise.all(CONFIG.leverBoards.map(fetchLever)),
+  ]);
+
+  const live = [].concat(...ghResults, ...leverResults);
+  const manual = CONFIG.manualListings.map(l => ({ ...l, tags: l.tags || [] }));
+
+  allListings = dedupe([...manual, ...live]);
+
+  const liveCount = live.length;
+  statusEl.textContent = `${allListings.length} listing${allListings.length === 1 ? '' : 's'} · ${liveCount} pulled live`;
+
+  buildTagFilters(allListings);
+  render();
+}
+
+searchInput.addEventListener('input', render);
+refreshBtn.addEventListener('click', loadAll);
+
+loadAll();
+</script>
+</body>
+</html>
