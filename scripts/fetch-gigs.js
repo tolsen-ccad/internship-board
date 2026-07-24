@@ -1,7 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 
-const EXCLUDED_KEYWORDS = ["senior", "sr", "lead", "director", "manager", "full time", "full-time"];
+const EXCLUDED_KEYWORDS = [
+  "senior", "sr", "lead", "director", "manager", "full time", "full-time",
+  "engineer", "engineering", "producer", "production coordinator",
+  "cloud infrastructure", "devops", "site reliability",
+  "backend developer", "backend engineer",
+];
 
 const FREELANCE_TRACKS = {
   "3D Game Art": ["3d artist", "3d modeler", "modeling", "texturing", "texture", "environment artist", "prop", "asset"],
@@ -36,7 +41,7 @@ async function fetchContractJobs() {
   const apiKey = process.env.SERPAPI_KEY;
   if (!apiKey) return [];
 
-  const query = '"3d freelance" OR "game art contract" OR "3d asset commission" OR "2d concept contract" OR "board game freelance" OR "tabletop contract" OR "2d game art freelance" OR "board game illustrator"';
+  const query = '"3d freelance" OR "game art contract" OR "3d asset commission" OR "2d concept contract" OR "board game freelance" OR "tabletop contract" OR "2d game art freelance" OR "board game illustrator" -engineer -engineering -producer -"cloud infrastructure" -devops';
   const url = `https://serpapi.com/search.json?engine=google_jobs&q=${encodeURIComponent(query)}&api_key=${apiKey}`;
 
   try {
@@ -46,6 +51,7 @@ async function fetchContractJobs() {
 
     return data.jobs_results
       .filter(job => !isSeniorOrFullTime(job.title))
+      .filter(job => classifyTracks(job.title).length > 0)
       .map(job => ({
         title: job.title,
         company: job.company_name,
@@ -95,10 +101,13 @@ async function fetchDiscordGigs() {
 
       if (!Array.isArray(messages)) continue;
 
-      // Filter for active community hiring opportunities
+      // Filter for active community hiring opportunities that also match
+      // an art/design curriculum track — same relevance bar as the other
+      // sources, so off-topic posts (LFP programmers, etc.) don't leak in.
       const hiringMessages = messages.filter(msg => {
         const text = msg.content.toLowerCase();
-        return (text.includes('hiring') || text.includes('looking for') || text.includes('paid') || text.includes('lfa') || text.includes('gig')) && !msg.author.bot;
+        const looksLikeGig = (text.includes('hiring') || text.includes('looking for') || text.includes('paid') || text.includes('lfa') || text.includes('gig')) && !msg.author.bot;
+        return looksLikeGig && classifyTracks(text).length > 0;
       });
 
       hiringMessages.forEach(msg => {
@@ -108,7 +117,7 @@ async function fetchDiscordGigs() {
 
         allGigs.push({
           title: dynamicTitle,
-          company: `${msg.author.global_name || msg.author.username} (@Discord)`,
+          company: `Community Post — ${serverName}`,
           location: "Remote / Discord",
           url: `https://discord.com/channels/${config.guildId}/${config.channelId}/${msg.id}`,
           posted: new Date(msg.timestamp).toISOString().split('T')[0],
