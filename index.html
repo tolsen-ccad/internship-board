@@ -192,6 +192,19 @@
     color: var(--text-muted);
   }
   .tag.new{ border-color: var(--teal); color: var(--teal); }
+  .tag.stale-badge{
+    border-color: var(--rose);
+    color: var(--rose);
+    background: rgba(239,122,154,0.1);
+  }
+
+  .card.stale{
+    opacity: 0.6;
+  }
+  .card.stale:hover{
+    opacity: 0.85;
+    border-color: var(--rose);
+  }
 
   .empty, .loading{
     text-align:center;
@@ -246,6 +259,12 @@ const CONFIG = {
   // are pulled in from Greenhouse/Lever. Manual listings bypass this.
   keywords: ["intern", "internship", "co-op", "co op", "apprentice"],
 
+  // Listings older than this many days get a visual "stale" flag —
+  // dimmed and marked, since manually-added entries especially can go
+  // out of date once a role fills. Live sources refresh their own dates
+  // automatically, so this mostly matters for manualListings.
+  staleAfterDays: 60,
+
   // Greenhouse board tokens. Find one by visiting a studio's careers
   // page — if the URL looks like boards.greenhouse.io/SOMENAME, use
   // SOMENAME here. Verify a token still works by visiting
@@ -269,21 +288,74 @@ const CONFIG = {
     "blackbirdinteractive", // Blackbird Interactive — Vancouver, Canada-eligible only
   ],
 
+  // RSS feeds — attempted as a LIVE source. Many RSS feeds block direct
+  // browser fetches (the server needs to send CORS headers allowing it,
+  // and not all do). This is tried first; if a feed fails to load, it's
+  // skipped silently and a console warning explains why — nothing else
+  // breaks. Check the browser console the first time this runs to see
+  // whether each feed actually loaded.
+  rssFeeds: [
+    {
+      name: "Work With Indies",
+      url: "https://workwithindies.com/careers/rss.xml",
+      // No separate keyword list needed — every item is checked against
+      // CONFIG.curriculumTracks below, and only kept if it matches at
+      // least one track.
+    },
+  ],
+
+  // Curriculum tracks — every listing gets classified against these and
+  // tagged accordingly (a listing can match more than one track). The tag
+  // filter chips at the top of the page are built from whatever tags
+  // exist, so these three become filterable categories automatically.
+  // Matching is keyword-in-title, case-insensitive — tune freely as the
+  // curriculum shifts.
+  curriculumTracks: {
+    "3D Game Art": [
+      "3d artist", "3d modeler", "modeling", "modeler", "texturing",
+      "texture artist", "rigging", "technical artist", "environment artist",
+      "character artist", "vfx", "animator", "animation",
+      "maya", "blender", "substance painter", "substance", "zbrush",
+      "unreal", "unity", "game engine",
+    ],
+    "2D Game Art": [
+      "2d artist", "illustrator", "concept artist", "ui artist", "ui/ux",
+      "ux designer", "graphic design", "character design",
+      "environment design", "map design", "print production", "pixel art",
+      "2d character", "skybox", "game rules", "layout design", "photoshop",
+    ],
+    "Digital Playspaces": [
+      "experimental media", "live media", "alternate controller",
+      "accessibility", "board game design", "tabletop design",
+      "installation", "interactive media", "physical computing",
+      "unreal", "unity",
+    ],
+  },
+
   // Hand-added listings — for studios without a Greenhouse/Lever API
   // (true micro-indie teams almost never have one), or anything you
   // found on Hitmarker, Games Jobs Direct, IndieGameJobs.com, or
   // WorkWithIndies.com. This is the list you'll maintain most — those
   // sites don't offer a feed of their own, so this is manual by design.
   // Copy the block below to add an entry:
+  // Seeded with a real batch pulled from Work With Indies on 2026-07-23,
+  // as a fallback in case the RSS feed above gets blocked by CORS.
+  // "posted" reflects when this was confirmed live, not the original
+  // post date (the source page doesn't expose that). Prune roles that
+  // have filled, and delete this whole block once you confirm the RSS
+  // feed is loading successfully (check the console for "RSS feed
+  // Work With Indies: N items loaded").
   manualListings: [
-    // {
-    //   title: "3D Environment Art Intern",
-    //   company: "Studio Name",
-    //   location: "Remote",
-    //   url: "https://...",
-    //   posted: "2026-07-01",
-    //   tags: ["Art", "Internship"],
-    // },
+    { title: "UI Artist", company: "Double Twizzle Games", location: "GMT-3 to -5", url: "https://www.workwithindies.com/careers/double-twizzle-games-ui-artist", posted: "2026-07-23", tags: ["2D Game Art"] },
+    { title: "2D Artist", company: "Double Twizzle Games", location: "GMT-3 to -5", url: "https://www.workwithindies.com/careers/double-twizzle-games-2d-artist", posted: "2026-07-23", tags: ["2D Game Art"] },
+    { title: "Cinematic Designer / Artist", company: "Firefly Studios", location: "Remote", url: "https://www.workwithindies.com/careers/firefly-studios-cinematic-designer-artist", posted: "2026-07-23", tags: ["3D Game Art"] },
+    { title: "3D Game Artist", company: "Grumpyface", location: "Remote", url: "https://www.workwithindies.com/careers/grumpyface-3d-game-artist", posted: "2026-07-23", tags: ["3D Game Art"] },
+    { title: "Concept Artist", company: "Foxglove Games", location: "Remote", url: "https://www.workwithindies.com/careers/foxglove-games-concept-artist", posted: "2026-07-23", tags: ["2D Game Art"] },
+    { title: "2D Character Artist", company: "Foxglove Games", location: "Remote", url: "https://www.workwithindies.com/careers/foxglove-games-2d-character-artist", posted: "2026-07-23", tags: ["2D Game Art"] },
+    { title: "2D Game Artist", company: "Reality Reload", location: "Remote", url: "https://www.workwithindies.com/careers/reality-reload-2d-game-artist", posted: "2026-07-23", tags: ["2D Game Art"] },
+    { title: "UI/UX Game Artist", company: "Meeple Corp", location: "Bath, UK / GMT ±2", url: "https://www.workwithindies.com/careers/meeple-corp-ui-ux-game-artist", posted: "2026-07-23", tags: ["2D Game Art"] },
+    { title: "2D Character / Concept Artist", company: "Midain Studios", location: "Remote", url: "https://www.workwithindies.com/careers/midain-studios-2d-character-concept-artist", posted: "2026-07-23", tags: ["2D Game Art"] },
+    { title: "2D Skybox Artist", company: "MakerScape", location: "PT ± 3 hours", url: "https://www.workwithindies.com/careers/makerscape-2d-skybox-artist", posted: "2026-07-23", tags: ["2D Game Art"] },
   ],
 };
 /* ======================================================================= */
@@ -304,6 +376,15 @@ function matchesKeyword(title){
   return CONFIG.keywords.some(k => t.includes(k));
 }
 
+// Returns the list of curriculum tracks whose keywords appear in the
+// given text (title, and for RSS items, the raw feed title too).
+function classifyTracks(text){
+  const t = text.toLowerCase();
+  return Object.entries(CONFIG.curriculumTracks)
+    .filter(([, keywords]) => keywords.some(k => t.includes(k)))
+    .map(([trackName]) => trackName);
+}
+
 function rankClass(tags){
   const t = tags.join(' ').toLowerCase();
   if (t.includes('co-op') || t.includes('co op')) return 'co-op';
@@ -319,9 +400,16 @@ function rankLabel(tags){
 }
 
 function isRecent(dateStr){
+  return daysOld(dateStr) <= 14;
+}
+
+function isStale(dateStr){
+  return daysOld(dateStr) > CONFIG.staleAfterDays;
+}
+
+function daysOld(dateStr){
   const posted = new Date(dateStr);
-  const days = (Date.now() - posted.getTime()) / (1000*60*60*24);
-  return days <= 14;
+  return (Date.now() - posted.getTime()) / (1000*60*60*24);
 }
 
 async function fetchGreenhouse(token){
@@ -337,7 +425,7 @@ async function fetchGreenhouse(token){
         location: (j.location && j.location.name) || 'Location TBD',
         url: j.absolute_url,
         posted: j.updated_at,
-        tags: ['Internship'],
+        tags: ['Internship', ...classifyTracks(j.title)],
       }));
   }catch(e){
     console.warn(`Greenhouse board "${token}" failed to load:`, e);
@@ -358,10 +446,63 @@ async function fetchLever(token){
         location: (j.categories && j.categories.location) || 'Location TBD',
         url: j.hostedUrl,
         posted: j.createdAt ? new Date(j.createdAt).toISOString() : new Date().toISOString(),
-        tags: ['Internship'],
+        tags: ['Internship', ...classifyTracks(j.text || '')],
       }));
   }catch(e){
     console.warn(`Lever board "${token}" failed to load:`, e);
+    return [];
+  }
+}
+
+async function fetchRSSFeed(feed){
+  try{
+    const res = await fetch(feed.url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const xmlText = await res.text();
+    const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
+
+    if (xml.querySelector('parsererror')){
+      throw new Error('Response was not valid XML — likely blocked or returned an HTML error page instead of the feed');
+    }
+
+    const items = [...xml.querySelectorAll('item')];
+    if (items.length === 0){
+      console.warn(`RSS feed "${feed.name}" loaded but contained no <item> entries — the feed's structure may differ from what this parser expects. Inspect the raw XML to confirm.`);
+      return [];
+    }
+
+    const text = (el, selector) => el.querySelector(selector)?.textContent?.trim() || '';
+
+    const parsed = items.map(item => {
+      const rawTitle = text(item, 'title');
+      const link = text(item, 'link') || text(item, 'guid');
+      const pubDate = text(item, 'pubDate');
+      const category = text(item, 'category');
+
+      // Titles on job-board RSS feeds commonly read like
+      // "Studio Name is hiring a Role Title" — split that out if present,
+      // otherwise fall back to the feed name as the company.
+      const hiringMatch = rawTitle.match(/^(.+?)\s+is hiring an?\s+(.+)$/i);
+      const company = category || (hiringMatch ? hiringMatch[1] : feed.name);
+      const roleTitle = hiringMatch ? hiringMatch[2] : rawTitle;
+
+      return {
+        title: roleTitle,
+        company,
+        location: 'See listing',
+        url: link,
+        posted: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
+        tags: classifyTracks(rawTitle),
+      };
+    });
+
+    const filtered = parsed.filter(j => j.tags.length > 0);
+
+    console.info(`RSS feed "${feed.name}": ${items.length} items loaded, ${filtered.length} matched keywords.`);
+    return filtered;
+
+  }catch(e){
+    console.warn(`RSS feed "${feed.name}" could not be loaded client-side (likely a CORS restriction — the server needs to allow cross-origin requests for this to work from a browser). Falling back to manualListings for this source. Details:`, e);
     return [];
   }
 }
@@ -421,10 +562,13 @@ function render(){
     a.href = l.url;
     a.target = '_blank';
     a.rel = 'noopener noreferrer';
-    a.className = 'card';
+    a.className = 'card' + (isStale(l.posted) ? ' stale' : '');
 
     const dateLabel = new Date(l.posted).toLocaleDateString(undefined, { month:'short', day:'numeric' });
     const newBadge = isRecent(l.posted) ? '<span class="tag new">NEW</span>' : '';
+    const staleBadge = isStale(l.posted)
+      ? `<span class="tag stale-badge">⚠ ${Math.floor(daysOld(l.posted))}d old — verify it's still open</span>`
+      : '';
 
     a.innerHTML = `
       <div class="rank ${rankClass(l.tags)}">${rankLabel(l.tags)}</div>
@@ -434,6 +578,7 @@ function render(){
         <div class="tags">
           ${l.tags.map(t => `<span class="tag">${escapeHtml(t)}</span>`).join('')}
           ${newBadge}
+          ${staleBadge}
         </div>
       </div>
     `;
@@ -451,14 +596,18 @@ async function loadAll(){
   statusEl.textContent = 'Loading listings…';
   feedEl.innerHTML = '<div class="loading">Fetching the latest quests…</div>';
 
-  const [ghResults, leverResults] = await Promise.all([
+  const [ghResults, leverResults, rssResults] = await Promise.all([
     Promise.all(CONFIG.greenhouseBoards.map(fetchGreenhouse)),
     Promise.all(CONFIG.leverBoards.map(fetchLever)),
+    Promise.all(CONFIG.rssFeeds.map(fetchRSSFeed)),
   ]);
 
-  const live = [].concat(...ghResults, ...leverResults);
+  const live = [].concat(...ghResults, ...leverResults, ...rssResults);
   const manual = CONFIG.manualListings.map(l => ({ ...l, tags: l.tags || [] }));
 
+  // If an RSS feed returned nothing (blocked, empty, or misconfigured),
+  // its manualListings entries — if any — still show up as normal, so the
+  // board never goes empty just because one live source failed.
   allListings = dedupe([...manual, ...live]);
 
   const liveCount = live.length;
