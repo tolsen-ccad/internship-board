@@ -218,9 +218,9 @@
   <header>
     <p class="eyebrow">// 3D MODELING, ART &amp; DESIGN</p>
     <h1 id="page-title">GAME ART GIG &amp; CONTRACT<br>QUEST BOARD</h1>
-    <p class="sub">Short-term contracts, freelance gigs, and asset commissions to help students build pipeline experience and strengthen their professional portfolios.</p>
+    <p class="sub">Short-term contracts, freelance gigs, and asset commissions to help students build pipeline experience and strengthen their portfolios.</p>
     
-    <!-- Unified Navigation Bar (Active state shifted to Gigs) -->
+    <!-- Unified Navigation Bar -->
     <nav class="board-nav">
       <a href="index.html" class="nav-item">⚔ Internships &amp; Careers</a>
       <a href="gigs.html" class="nav-item active">💎 Contract &amp; Gigs</a>
@@ -244,8 +244,8 @@
 const CONFIG = {
   pageTitle: "GAME ART GIG &amp; CONTRACT<br>QUEST BOARD",
 
-  keywords: ["contract", "contractor", "freelance", "freelancer", "commission", "short term", "temporary", "project-based", "hiring", "looking for artist"],
-  excludedKeywords: ["senior", "sr", "lead", "director", "manager", "full time", "permanent"],
+  keywords: ["contract", "contractor", "freelance", "freelancer", "commission", "short term", "temporary", "project-based", "hiring", "[hiring]", "looking for artist", "lf artist", "lfa"],
+  excludedKeywords: ["senior", "sr", "lead", "director", "manager", "full time", "permanent", "[for hire]", "l4h"],
   staleAfterDays: 30,
 
   greenhouseBoards: [
@@ -295,6 +295,10 @@ const CONFIG = {
     {
       name: "r/gameDevClassifieds",
       url: "https://www.reddit.com/r/gameDevClassifieds/.rss",
+    },
+    {
+      name: "r/DesignJobs",
+      url: "https://www.reddit.com/r/DesignJobs/.rss",
     }
   ],
 
@@ -426,27 +430,46 @@ async function fetchLever(token){
 
 async function fetchRSSFeed(feed){
   try{
-    const res = await fetch(feed.url);
+    let url = feed.url;
+    
+    // Wrap Reddit feeds with a public CORS proxy to safely fetch without browser origin blocks
+    if (url.includes('reddit.com')) {
+      url = `https://corsproxy.io/?${encodeURIComponent(url)}`;
+    }
+
+    const res = await fetch(url);
     if (!res.ok) throw new Error();
     const xmlText = await res.text();
     const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
+    
+    // Support standard RSS (<item>) and Reddit/Atom structures (<entry>)
     const items = [...xml.querySelectorAll('item')];
-    const text = (el, selector) => el.querySelector(selector)?.textContent?.trim() || '';
+    const entries = [...xml.querySelectorAll('entry')];
+    const targetNodes = items.length ? items : entries;
 
-    return items.map(item => {
-      const rawTitle = text(item, 'title');
-      const link = text(item, 'link') || text(item, 'guid');
-      const pubDate = text(item, 'pubDate');
+    return targetNodes.map(node => {
+      const rawTitle = node.querySelector('title')?.textContent?.trim() || '';
+      
+      // Handle standard XML link text node vs Atom link element attribute href
+      let link = node.querySelector('link')?.textContent?.trim() || node.querySelector('guid')?.textContent?.trim() || '';
+      if (!link && node.querySelector('link')) {
+        link = node.querySelector('link').getAttribute('href') || '';
+      }
+      
+      // Handle pubDate vs updated (Atom structure)
+      const pubDate = node.querySelector('pubDate')?.textContent || node.querySelector('updated')?.textContent || '';
+      
       return {
         title: rawTitle,
         company: feed.name,
-        location: 'See listing',
+        location: 'Remote / Online',
         url: link,
         posted: pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
         tags: [determineJobTypeTag(rawTitle), ...classifyTracks(rawTitle)],
       };
     }).filter(j => isValidJob(j.title));
   }catch(e){
+    console.error(`Error parsing feed: ${feed.name}`, e);
     return [];
   }
 }
