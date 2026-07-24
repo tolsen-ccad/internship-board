@@ -203,7 +203,6 @@
 const CONFIG = {
   pageTitle: "CAREER &amp; INTERNSHIP<br>QUEST BOARD",
 
-  // Target both internships/co-ops and entry-level/junior designations
   keywords: ["intern", "internship", "co-op", "co op", "apprentice", "trainee", "entry level", "junior"],
   excludedKeywords: ["senior", "sr", "lead", "director", "manager", "principal", "staff", "head of", "chief", "expert", "experienced"],
   staleAfterDays: 60,
@@ -283,8 +282,8 @@ const CONFIG = {
   },
 
   manualListings: [
-    { title: "UI Art Intern", company: "Double Twizzle Games", location: "Remote", url: "https://www.workwithindies.com/careers/double-twizzle-games-ui-artist", posted: "2026-07-23", tags: ["2D Game Art", "Internship"] },
-    { title: "Junior 3D Modeler", company: "SimulCraft Medical", location: "Remote", url: "https://www.workwithindies.com/careers/firefly-studios-cinematic-designer-artist", posted: "2026-07-23", tags: ["Medical / Simulation", "Entry-Level"] },
+    { title: "UI Art Intern", company: "Double Twizzle Games", location: "Remote", url: "https://workwithindies.com/careers/double-twizzle-games-ui-artist", posted: "2026-07-23", tags: ["2D Game Art", "Internship"] },
+    { title: "Cinematic Art Apprentice", company: "Firefly Studios", location: "Remote", url: "https://workwithindies.com/careers/firefly-studios-cinematic-designer-artist", posted: "2026-07-23", tags: ["3D Game Art", "Internship"] },
   ],
 };
 
@@ -425,10 +424,14 @@ function dedupe(listings){
 
 function buildTagFilters(listings){
   const tagSet = new Set();
-  listings.forEach(l => l.tags.forEach(t => tagSet.add(t)));
+  const hiddenTags = ["Medical / Simulation"]; // Tags that will appear on cards but won't be clickable filter buttons
+
+  listings.forEach(l => l.tags.forEach(t => {
+    if (!hiddenTags.includes(t)) tagSet.add(t);
+  }));
+
   tagFiltersEl.innerHTML = '';
   
-  // Sort with Type badges first (Internship, Entry-Level, Co-Op) if present
   const sortedTags = [...tagSet].sort((a, b) => {
     const priorities = { "Internship": 1, "Entry-Level": 2, "Co-Op": 3 };
     const pA = priorities[a] || 99;
