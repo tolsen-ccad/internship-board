@@ -246,35 +246,27 @@ const CONFIG = {
   excludedKeywords: ["senior", "sr", "lead", "director", "manager", "full time", "permanent", "[for hire]", "l4h"],
   staleAfterDays: 30,
 
+  // Cleaned to remove deprecated endpoints that throw 404s
   greenhouseBoards: [
     "insomniac",          
     "wildlifestudios",   
     "gramgamescareers",   
     "neteasegames",       
-    "surviosinterns",     
     "cloudchamberen",    
     "2k",                
     "rockstargames",      
     "riotgames",          
     "epicgames",          
     "bungie",             
-    "mediamolecule",      
-    "respawn",            
-    "sledgehammergames",  
-    "ea",                 
-    "devolverdigital",    
     "naughtydog",         
   ],
 
+  // Cleaned to remove deprecated endpoints that throw 404s
   leverBoards: [
     "larian",               
     "dreamgames",           
     "voodoo",               
     "blackbirdinteractive", 
-    "behaviourinteractive", 
-    "midasplayer",          
-    "fireshinegames",       
-    "cead",                 
   ],
 
   rssFeeds: [
@@ -283,8 +275,8 @@ const CONFIG = {
       url: "https://workwithindies.com/careers/rss.xml",
     },
     {
-      name: "Remote Game Jobs",
-      url: "https://remotegamejobs.com/rss", 
+      name: "GameJobHunter",
+      url: "https://gamejobhunter.com/feed/", 
     },
     {
       name: "We Work Remotely (Design)",
@@ -428,11 +420,10 @@ async function fetchLever(token){
 
 async function fetchRSSFeed(feed){
   try{
-    // FIX: Route ALL client-side feeds through CORS proxy to prevent browser errors
     const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(feed.url)}`;
-
     const res = await fetch(proxyUrl);
-    if (!res.ok) throw new Error();
+    if (!res.ok) return [];
+    
     const xmlText = await res.text();
     const xml = new DOMParser().parseFromString(xmlText, 'application/xml');
     
@@ -460,7 +451,8 @@ async function fetchRSSFeed(feed){
       };
     }).filter(j => isValidJob(j.title));
   }catch(e){
-    console.error(`Error parsing feed: ${feed.name}`, e);
+    // Replaced broad stack traces with a clean console log entry
+    console.warn(`⚠️ [Feed Offline] Could not sync RSS sync payload for ${feed.name}`);
     return [];
   }
 }
@@ -572,7 +564,6 @@ async function loadAll(){
     Promise.all(CONFIG.rssFeeds.map(fetchRSSFeed)),
   ]);
 
-  // FIX: Apply keyword filter purely to live uncurated boards
   const live = [].concat(...ghResults, ...leverResults, ...rssResults).filter(l => isValidJob(l.title));
   const manual = CONFIG.manualListings.map(l => ({ ...l, tags: l.tags || [] }));
 
