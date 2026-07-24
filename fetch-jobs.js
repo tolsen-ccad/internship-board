@@ -67,7 +67,7 @@ async function fetchGoogleJobs() {
   }
 
   // OPTIMIZED QUERY: Added board game, tabletop, and 2d game art entry targets
-  const query = "3d artist intern OR 3d modeler entry level OR junior 3d designer OR product design junior OR 3d art apprentice OR game design apprentice OR board game intern OR tabletop junior OR 2d game art intern OR board game designer entry level OR character design intern OR concept artist junior OR concept art intern OR prop artist intern OR game designer entry level OR level design intern";
+  const query = "3d artist intern OR 3d modeler entry level OR junior 3d designer OR product design junior OR 3d art apprentice OR game design apprentice OR board game intern OR tabletop junior OR 2d game art intern OR board game designer entry level OR character design intern OR concept artist junior OR concept art intern OR prop artist intern OR game designer entry level OR level design intern OR pixel artist intern OR pixel art junior";
   const url = `https://serpapi.com/search.json?engine=google_jobs&q=${encodeURIComponent(query)}&api_key=${apiKey}`;
 
   try {

@@ -10,7 +10,7 @@ const EXCLUDED_KEYWORDS = [
 
 const FREELANCE_TRACKS = {
   "3D Game Art": ["3d artist", "3d modeler", "modeling", "texturing", "texture", "environment artist", "prop", "asset"],
-  "2D Game Art": ["2d artist", "concept artist", "concept art", "illustrator", "ui artist", "sprite", "2d art", "board game art", "tabletop art", "character design", "prop art", "prop design", "game designer", "game design", "level design", "level designer"],
+  "2D Game Art": ["2d artist", "concept artist", "concept art", "illustrator", "ui artist", "sprite", "2d art", "pixel art", "board game art", "tabletop art", "character design", "prop art", "prop design", "game designer", "game design", "level design", "level designer"],
   "Vehicle / Product Design": ["cad", "industrial design", "solidworks"],
   "Digital Playspaces": ["board game", "tabletop", "board game design", "tabletop design", "card game", "game designer", "game design", "level design", "level designer"]
 };
@@ -41,7 +41,7 @@ async function fetchContractJobs() {
   const apiKey = process.env.SERPAPI_KEY;
   if (!apiKey) return [];
 
-  const query = '"3d freelance" OR "game art contract" OR "3d asset commission" OR "2d concept contract" OR "board game freelance" OR "tabletop contract" OR "2d game art freelance" OR "board game illustrator" OR "character design freelance" OR "concept artist contract" OR "concept art commission" OR "prop artist contract" OR "prop art commission" OR "level design contract" OR "game designer freelance" -engineer -engineering -producer -"cloud infrastructure" -devops';
+  const query = '"3d freelance" OR "game art contract" OR "3d asset commission" OR "2d concept contract" OR "board game freelance" OR "tabletop contract" OR "2d game art freelance" OR "board game illustrator" OR "character design freelance" OR "concept artist contract" OR "concept art commission" OR "prop artist contract" OR "prop art commission" OR "level design contract" OR "game designer freelance" OR "pixel artist freelance" OR "pixel art commission" -engineer -engineering -producer -"cloud infrastructure" -devops';
   const url = `https://serpapi.com/search.json?engine=google_jobs&q=${encodeURIComponent(query)}&api_key=${apiKey}`;
 
   try {
