@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Game Art Gig &amp; Contract Board</title>
+<title>Game Art Gig &amp; Contract Quest Board</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
@@ -54,6 +54,41 @@
   }
 
   .sub{ color: var(--text-muted); font-size: 14px; margin: 0; }
+
+  /* Navigation Styles */
+  .board-nav {
+    display: flex;
+    gap: 12px;
+    margin: 24px 0 12px;
+  }
+
+  .nav-item {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    background: rgba(42, 43, 87, 0.4);
+    border: 1px solid var(--border);
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .nav-item:hover {
+    border-color: var(--teal);
+    color: var(--text);
+    background: var(--surface);
+  }
+
+  .nav-item.active {
+    background: var(--surface);
+    border-color: var(--amber);
+    color: var(--amber);
+    box-shadow: 0 0 12px rgba(242, 184, 75, 0.15);
+  }
 
   .controls{
     display:flex; gap:10px; flex-wrap:wrap;
@@ -184,6 +219,12 @@
     <p class="eyebrow">// 3D MODELING, ART &amp; DESIGN</p>
     <h1 id="page-title">GAME ART GIG &amp; CONTRACT<br>QUEST BOARD</h1>
     <p class="sub">Short-term contracts, freelance gigs, and asset commissions to help students build pipeline experience and strengthen their professional portfolios.</p>
+    
+    <!-- Unified Navigation Bar (Active state shifted to Gigs) -->
+    <nav class="board-nav">
+      <a href="index.html" class="nav-item">⚔ Internships &amp; Careers</a>
+      <a href="gigs.html" class="nav-item active">💎 Contract &amp; Gigs</a>
+    </nav>
   </header>
 
   <div class="controls" id="tag-filters"></div>
