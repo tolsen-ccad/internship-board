@@ -281,6 +281,14 @@ const CONFIG = {
     {
       name: "Games Jobs Direct",
       url: "https://www.gamesjobsdirect.com/rss", 
+    },
+    {
+      // Documented, keyless RSS feed with explicit job-type filtering
+      // (?type=internship) — see https://jobicy.com/jobs-rss-feed.
+      // Their fair-use guidance asks for no more than hourly polling,
+      // which a per-visitor page load comfortably stays under.
+      name: "Jobicy — Design Internships",
+      url: "https://jobicy.com/jobs/feed?industry=design-multimedia&type=internship",
     }
   ],
 
