@@ -2,10 +2,12 @@ const fs = require('fs');
 const path = require('path');
 
 const EXCLUDED_KEYWORDS = ["senior", "sr", "lead", "director", "manager", "full time", "full-time"];
+
 const FREELANCE_TRACKS = {
   "3D Game Art": ["3d artist", "3d modeler", "modeling", "texturing", "texture", "environment artist", "prop", "asset"],
-  "2D Game Art": ["2d artist", "concept artist", "illustrator", "ui artist", "sprite"],
-  "Vehicle / Product Design": ["cad", "industrial design", "solidworks"]
+  "2D Game Art": ["2d artist", "concept artist", "illustrator", "ui artist", "sprite", "2d art", "board game art", "tabletop art"],
+  "Vehicle / Product Design": ["cad", "industrial design", "solidworks"],
+  "Digital Playspaces": ["board game", "tabletop", "board game design", "tabletop design", "card game"]
 };
 
 function isSeniorOrFullTime(title) {
@@ -31,8 +33,8 @@ async function fetchContractJobs() {
   const apiKey = process.env.SERPAPI_KEY;
   if (!apiKey) return [];
 
-  // Query targeting freelance, contract, and short-term game art gigs
-  const query = '"3d freelance" OR "game art contract" OR "3d asset commission" OR "short term 3d modeling" OR "2d concept contract"';
+  // OPTIMIZED QUERY: Added targeted terms for tabletop, freelance board games, and 2D freelance roles
+  const query = '"3d freelance" OR "game art contract" OR "3d asset commission" OR "2d concept contract" OR "board game freelance" OR "tabletop contract" OR "2d game art freelance" OR "board game illustrator"';
   const url = `https://serpapi.com/search.json?engine=google_jobs&q=${encodeURIComponent(query)}&api_key=${apiKey}`;
 
   try {
@@ -57,23 +59,22 @@ async function fetchContractJobs() {
 }
 
 async function updateGigBoard() {
-  const newGigs = await fetchContractJobs();
   const gigsPath = path.join(__dirname, '../gigs.html');
   
   if (!fs.existsSync(gigsPath)) return;
 
+  const newGigs = await fetchContractJobs();
   let html = fs.readFileSync(gigsPath, 'utf8');
   const regex = /manualListings:\s*\[([\s\S]*?)\]\s*,/;
   const match = html.match(regex);
   if (!match) return;
 
-  // SAFE PARSING WRAPPER
   let existingGigs = [];
   try {
     existingGigs = new Function(`return [${match[1]}]`)();
   } catch (e) {
     console.error("Error parsing existing manual gigs within HTML source code:", e);
-    return; // Stop execution smoothly to prevent workflow crashes
+    return;
   }
 
   const combined = [...existingGigs];
@@ -82,7 +83,6 @@ async function updateGigBoard() {
     if (!combined.some(g => g.url === gig.url)) combined.push(gig);
   });
 
-  // Gigs move fast, keep active history to 45 days max
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - 45);
 
