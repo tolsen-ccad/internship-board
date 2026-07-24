@@ -204,18 +204,7 @@ const CONFIG = {
   pageTitle: "CAREER &amp; INTERNSHIP<br>QUEST BOARD",
 
   keywords: ["intern", "internship", "co-op", "co op", "apprentice", "trainee", "entry level", "junior"],
-  excludedKeywords: [
-    "senior", "sr", "lead", "director", "manager", "principal", "staff", "head of", "chief", "expert", "experienced",
-    // Off-scope domains — this board is for art/design skillsets, not
-    // business, marketing, or admin roles that occasionally show up in
-    // broad job-board searches.
-    "marketing", "market research", "business development", "sales",
-    "account manager", "account executive", "communications",
-    "public relations", "social media manager", "content marketing",
-    "seo", "human resources", "recruiter", "recruiting", "accounting",
-    "operations manager", "business analyst", "copywriter",
-    "customer success", "sales rep",
-  ],
+  excludedKeywords: ["senior", "sr", "lead", "director", "manager", "principal", "staff", "head of", "chief", "expert", "experienced"],
   staleAfterDays: 60,
 
   greenhouseBoards: [
@@ -296,15 +285,6 @@ const CONFIG = {
     { title: "UI Art Intern", company: "Double Twizzle Games", location: "Remote", url: "https://workwithindies.com/careers/double-twizzle-games-ui-artist", posted: "2026-07-23", tags: ["2D Game Art", "Internship"] },
     { title: "Cinematic Art Apprentice", company: "Firefly Studios", location: "Remote", url: "https://workwithindies.com/careers/firefly-studios-cinematic-designer-artist", posted: "2026-07-23", tags: ["3D Game Art", "Internship"] },
   ],
-
-  // ==== AUTO-GENERATED-LISTINGS-START ====
-  // Populated by scripts/fetch-jobs.js on its scheduled run. Don't hand-edit
-  // this array — it gets fully replaced (not appended to) every run, so
-  // anything you type here will be overwritten. Use manualListings above
-  // for anything you want to add and keep permanently.
-  autoListings: [
-  ],
-  // ==== AUTO-GENERATED-LISTINGS-END ====
 };
 
 const feedEl = document.getElementById('feed');
@@ -322,13 +302,7 @@ function isValidJob(title){
   const t = title.toLowerCase();
   const hasExcluded = CONFIG.excludedKeywords.some(ex => t.includes(ex));
   if (hasExcluded) return false;
-  const hasLevelKeyword = CONFIG.keywords.some(k => t.includes(k));
-  if (!hasLevelKeyword) return false;
-  // Positive requirement: the title has to actually match one of the
-  // curriculum tracks below. This is what keeps off-scope-but-technically-
-  // entry-level roles (e.g. a junior marketing coordinator) out, rather
-  // than relying only on catching them by name in excludedKeywords.
-  return classifyTracks(title).length > 0;
+  return CONFIG.keywords.some(k => t.includes(k));
 }
 
 function determineJobTypeTag(title){
