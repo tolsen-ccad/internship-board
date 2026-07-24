@@ -201,29 +201,38 @@
 const CONFIG = {
   pageTitle: "INTERNSHIP<br>QUEST BOARD",
 
-  keywords: ["intern", "internship", "co-op", "co op", "apprentice", "entry", "junior"],
+  keywords: ["intern", "internship", "co-op", "co op", "apprentice", "entry", "junior", "artist", "3d"],
   staleAfterDays: 60,
 
-  // Expanded Greenhouse API tokens (including AAA & major publishers/subsidiaries)
   greenhouseBoards: [
-    "insomniac",         // Insomniac Games (PlayStation)
-    "wildlifestudios",   // Wildlife Studios
-    "gramgamescareers",  // Gram Games
-    "neteasegames",      // NetEase Games
-    "surviosinterns",    // Survios
-    "cloudchamberen",    // Cloud Chamber (2K)
-    "2k",                // 2K Games
-    "rockstargames",     // Rockstar Games
-    "riotgames",         // Riot Games (frequently uses Greenhouse for specific pipelines)
-    "epicgames",         // Epic Games ATS feeds where available
+    "insomniac",          
+    "wildlifestudios",   
+    "gramgamescareers",   
+    "neteasegames",       
+    "surviosinterns",     
+    "cloudchamberen",    
+    "2k",                
+    "rockstargames",      
+    "riotgames",          
+    "epicgames",          
+    "bungie",             
+    "mediamolecule",      
+    "respawn",            
+    "sledgehammergames",  
+    "ea",                 
+    "devolverdigital",    
+    "naughtydog",         
   ],
 
-  // Expanded Lever API tokens
   leverBoards: [
-    "larian",               // Larian Studios
-    "dreamgames",           // Dream Games
-    "voodoo",               // Voodoo
-    "blackbirdinteractive", // Blackbird Interactive
+    "larian",               
+    "dreamgames",           
+    "voodoo",               
+    "blackbirdinteractive", 
+    "behaviourinteractive", 
+    "midasplayer",          
+    "fireshinegames",       
+    "cead",                 
   ],
 
   rssFeeds: [
@@ -231,15 +240,27 @@ const CONFIG = {
       name: "Work With Indies",
       url: "https://workwithindies.com/careers/rss.xml",
     },
+    {
+      name: "Remote Game Jobs",
+      url: "https://remotegamejobs.com/rss", 
+    },
+    {
+      name: "Games Jobs Direct",
+      url: "https://www.gamesjobsdirect.com/rss", 
+    },
   ],
 
+  // Curriculum tracks now include "Entry-Level" alongside art and playspace tracks
   curriculumTracks: {
+    "Entry-Level": [
+      "entry", "junior", "jr", "associate", "graduate", "trainee", "apprentice", "co-op", "co op", "intern", "internship"
+    ],
     "3D Game Art": [
       "3d artist", "3d modeler", "modeling", "modeler", "texturing",
       "texture artist", "rigging", "technical artist", "environment artist",
       "character artist", "vfx", "animator", "animation",
       "maya", "blender", "substance painter", "substance", "zbrush",
-      "unreal", "unity", "game engine",
+      "unreal", "unity", "game engine", "3d",
     ],
     "2D Game Art": [
       "2d artist", "illustrator", "concept artist", "ui artist", "ui/ux",
@@ -256,8 +277,8 @@ const CONFIG = {
   },
 
   manualListings: [
-    { title: "UI Artist", company: "Double Twizzle Games", location: "Remote", url: "https://www.workwithindies.com/careers/double-twizzle-games-ui-artist", posted: "2026-07-23", tags: ["2D Game Art"] },
-    { title: "Cinematic Designer / Artist", company: "Firefly Studios", location: "Remote", url: "https://www.workwithindies.com/careers/firefly-studios-cinematic-designer-artist", posted: "2026-07-23", tags: ["3D Game Art"] },
+    { title: "UI Artist", company: "Double Twizzle Games", location: "Remote", url: "https://www.workwithindies.com/careers/double-twizzle-games-ui-artist", posted: "2026-07-23", tags: ["2D Game Art", "Entry-Level"] },
+    { title: "Cinematic Designer / Artist", company: "Firefly Studios", location: "Remote", url: "https://www.workwithindies.com/careers/firefly-studios-cinematic-designer-artist", posted: "2026-07-23", tags: ["3D Game Art", "Entry-Level"] },
   ],
 };
 
