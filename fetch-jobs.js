@@ -99,7 +99,7 @@ async function fetchGoogleJobs() {
 
 async function updateBoard() {
   const newJobs = await fetchGoogleJobs();
-  const indexPath = path.join(__dirname, '../index.html');
+  const indexPath = path.join(__dirname, 'index.html');
   
   if (!fs.existsSync(indexPath)) {
     console.error(`Could not find index.html at expected path: ${indexPath}`);

@@ -136,7 +136,7 @@ async function fetchDiscordGigs() {
 // COMPILATION AND BOARD SAVE INTERACTION
 // ==========================================
 async function updateGigBoard() {
-  const gigsPath = path.join(__dirname, '../gigs.html');
+  const gigsPath = path.join(__dirname, 'gigs.html');
   if (!fs.existsSync(gigsPath)) return;
 
   // Pull asynchronously from both networks
