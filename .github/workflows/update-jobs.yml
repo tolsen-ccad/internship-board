@@ -13,6 +13,9 @@ concurrency:
 jobs:
   update-board:
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     permissions:
       contents: write  # Needed to commit changes back to the repo
       pages: write     # Needed to deploy to GitHub Pages
@@ -47,4 +50,5 @@ jobs:
           path: '.' # Bundles the entire root directory (both HTML files)
 
       - name: Deploy to GitHub Pages
+        id: deployment
         uses: actions/deploy-pages@v5
