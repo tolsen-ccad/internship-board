@@ -30,8 +30,8 @@ jobs:
         env:
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
         run: |
-          node scripts/fetch-jobs.js
-          node scripts/fetch-gigs.js
+          node fetch-jobs.js
+          node fetch-gigs.js
 
       - name: Commit and Push Changes
         run: |
