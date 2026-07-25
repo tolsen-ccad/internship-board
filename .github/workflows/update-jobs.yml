@@ -29,6 +29,7 @@ jobs:
       - name: Run Job and Gig Scraper Scripts
         env:
           SERPAPI_KEY: ${{ secrets.SERPAPI_KEY }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
         run: |
           node fetch-jobs.js
           node fetch-gigs.js
